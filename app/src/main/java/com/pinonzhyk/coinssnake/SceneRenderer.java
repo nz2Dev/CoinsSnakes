@@ -1,10 +1,13 @@
 package com.pinonzhyk.coinssnake;
 
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.os.Handler;
 import android.util.AttributeSet;
+import android.view.Choreographer;
 import android.view.View;
 
 import androidx.annotation.Nullable;
@@ -35,9 +38,6 @@ public class SceneRenderer extends View  {
     }
 
     private void calculateUnitScale() {
-//        int unitsMax = Math.max(scene.getWidthUnits(), scene.getHeightUnits());
-//        int pixelsMin = Math.min(getWidth(), getHeight());
-//        pixelsPerSceneUnit = (int) Math.floor((double) pixelsMin / unitsMax);
         float widthScale = ((float) getWidth() / scene.getWidthUnits());
         float heightScale = ((float) getHeight() / scene.getHeightUnits());
         pixelsPerSceneUnit = Math.min(widthScale, heightScale);
@@ -73,8 +73,6 @@ public class SceneRenderer extends View  {
     }
 
     private void drawLineSquare(Canvas canvas, float width, float height, Paint paint) {
-//        width -= 10;
-//        height -= 10;
         canvas.drawLine(0, 0, width, 0, paint);
         canvas.drawLine(0, 0, 0, height, paint);
         canvas.drawLine(width, 0, width, height, paint);
