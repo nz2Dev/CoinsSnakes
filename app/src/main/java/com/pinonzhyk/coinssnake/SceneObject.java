@@ -10,6 +10,24 @@ public class SceneObject {
         this.y = y;
     }
 
+    private float startTime = -1;
+    private int startX;
+
+    public void update(float time) {
+        if (startTime == -1) {
+            startTime = time;
+            startX = x;
+            return;
+        }
+
+        float diff = time - startTime;
+        x = (int) (startX + diff * 200);
+        if (x > 1000) {
+            x = startX;
+            startTime = time;
+        }
+    }
+
     public int getX() {
         return x;
     }

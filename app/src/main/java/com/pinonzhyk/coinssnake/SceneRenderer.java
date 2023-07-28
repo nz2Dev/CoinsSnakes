@@ -17,15 +17,23 @@ public class SceneRenderer extends View  {
     private Scene scene;
     private float pixelsPerSceneUnit;
     private Paint paint = new Paint();
-
+    private int fpsDebug;
+    private Paint fpsPaint;
 
     public SceneRenderer(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
+        fpsPaint = new Paint();
+        fpsPaint.setTextSize(32);
     }
 
     public void setScene(Scene scene) {
         this.scene = scene;
         calculateUnitScale();
+        invalidate();
+    }
+
+    public void setFpsDebug(int fpsDebug) {
+        this.fpsDebug = fpsDebug;
         invalidate();
     }
 
@@ -46,14 +54,15 @@ public class SceneRenderer extends View  {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        canvas.drawText("FPS: " + fpsDebug, 50, 74, fpsPaint);
+
         // view borders
         drawLineSquare(canvas, getWidth(), getHeight(), paint);
         // scene borders
         drawLineSquare(canvas,
                 scene.getWidthUnits() * pixelsPerSceneUnit,
                 scene.getHeightUnits() * pixelsPerSceneUnit,
-                paint
-        );
+                paint);
 
         for (SceneObject sceneObject : scene.getSceneObjects()) {
             canvas.save();
@@ -64,8 +73,8 @@ public class SceneRenderer extends View  {
             canvas.drawRect(
                     0,
                     0,
-                    1 * pixelsPerSceneUnit,
-                    1 * pixelsPerSceneUnit,
+                    50 * pixelsPerSceneUnit,
+                    50 * pixelsPerSceneUnit,
                     paint
             );
             canvas.restore();
