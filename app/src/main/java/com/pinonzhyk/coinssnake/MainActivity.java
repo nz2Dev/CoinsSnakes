@@ -4,37 +4,23 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 
-import com.pinonzhyk.coinssnake.game.Movable;
-import com.pinonzhyk.coinssnake.world.Scene;
+import com.pinonzhyk.coinssnake.game.GameManager;
 import com.pinonzhyk.coinssnake.world.World;
-import com.pinonzhyk.coinssnake.world.WorldObject;
-
-import java.util.Arrays;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
     private GameLoop gameLoop;
+    private GameManager gameManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        final WorldObject movableObj = new WorldObject(25, 25, 100, 100);
-        movableObj.addLogicComponent(new Movable());
+        gameManager = new GameManager();
+        gameManager.createGame();
 
-        final World world = new World(1000, 1000, new Scene(Arrays.asList(
-                new WorldObject(25, 85),
-                movableObj
-        )));
-        world.init();
-        world.setClickEventsListener((receiver, x, y) -> {
-            if (receiver == null) {
-                world.instantiateWorldObject(new WorldObject(x, y, 50, 50));
-            }
-        });
-
+        final World world = gameManager.getGameWorld();
         final RenderView renderView = findViewById(R.id.renderView);
         renderView.setVisibleBounds(world.getBoundsWidthUnits(), world.getBoundsHeightUnits());
         renderView.setInputCallback((xPositionUnit, yPositionUnit) -> {

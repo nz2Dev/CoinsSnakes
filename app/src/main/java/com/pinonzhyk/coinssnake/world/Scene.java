@@ -15,6 +15,10 @@ public class Scene {
         this.worldObjects = new ArrayList<>(worldObjects);
     }
 
+    public Scene() {
+        this.worldObjects = new ArrayList<>();
+    }
+
     public Collection<WorldObject> getAllObjects() {
         return worldObjects;
     }

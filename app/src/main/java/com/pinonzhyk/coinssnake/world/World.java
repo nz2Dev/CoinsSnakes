@@ -5,19 +5,13 @@ import java.util.Collection;
 public class World {
     private int boundsWidthUnits;
     private int boundsHeightUnits;
+    private final Scene scene;
     private ClickEventsListener clickEventsListener;
-    private Scene scene;
 
-    public World(int boundsWidthUnits, int boundsHeightUnits, Scene scene) {
+    public World(int boundsWidthUnits, int boundsHeightUnits) {
         this.boundsWidthUnits = boundsWidthUnits;
         this.boundsHeightUnits = boundsHeightUnits;
-        this.scene = scene;
-    }
-
-    public void init() {
-        for (WorldObject worldObject : scene.getAllObjects()) {
-            worldObject.init();
-        }
+        this.scene = new Scene();
     }
 
     public int getBoundsWidthUnits() {
