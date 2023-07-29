@@ -28,6 +28,13 @@ public class World {
         return boundsHeightUnits;
     }
 
+    public void instantiateWorldObject(WorldObject object) {
+        if (!scene.contains(object)) {
+            scene.addObject(object);
+            object.init();
+        }
+    }
+
     public Collection<WorldObject> getObjects() {
         return scene.getAllObjects();
     }

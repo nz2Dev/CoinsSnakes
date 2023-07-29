@@ -58,12 +58,16 @@ public class RenderView extends View  {
         }
 
         if (event.getAction() == MotionEvent.ACTION_UP) {
-            int x = (int) ((event.getX() / getWidth()) * visibleWidthUnit);
-            int y = (int) ((event.getY() / getHeight()) * visibleHeightUnit);
+            int x = pixelPositionToUnit(event.getX());
+            int y = pixelPositionToUnit(event.getY());
             inputCallback.onClick(x, y);
         }
 
         return true;
+    }
+
+    private int pixelPositionToUnit(float pixelCoord) {
+        return (int) (pixelCoord / pixelsPerSceneUnit);
     }
 
     @Override
@@ -99,10 +103,14 @@ public class RenderView extends View  {
                     worldObject.position.x * pixelsPerSceneUnit,
                     worldObject.position.y * pixelsPerSceneUnit
             );
+
+            int halfSurfaceX = worldObject.inputSurfaceSize.x / 2;
+            int halfSurfaceY = worldObject.inputSurfaceSize.y / 2;
             canvas.drawRect(
-                    0, 0,
-                    worldObject.inputSurfaceSize.x * pixelsPerSceneUnit,
-                    worldObject.inputSurfaceSize.y * pixelsPerSceneUnit,
+                    -halfSurfaceX * pixelsPerSceneUnit,
+                    -halfSurfaceY * pixelsPerSceneUnit,
+                    halfSurfaceX * pixelsPerSceneUnit,
+                    halfSurfaceY * pixelsPerSceneUnit,
                     paint
             );
             canvas.restore();

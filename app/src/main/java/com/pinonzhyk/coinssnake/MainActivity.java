@@ -29,6 +29,11 @@ public class MainActivity extends AppCompatActivity {
                 movableObj
         )));
         world.init();
+        world.setClickEventsListener((receiver, x, y) -> {
+            if (receiver == null) {
+                world.instantiateWorldObject(new WorldObject(x, y, 50, 50));
+            }
+        });
 
         final RenderView renderView = findViewById(R.id.renderView);
         renderView.setVisibleBounds(world.getBoundsWidthUnits(), world.getBoundsHeightUnits());
