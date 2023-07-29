@@ -1,4 +1,4 @@
-package com.pinonzhyk.coinssnake;
+package com.pinonzhyk.coinssnake.world;
 
 import java.util.Collection;
 import java.util.List;

@@ -8,6 +8,8 @@ import android.view.View;
 
 import androidx.annotation.Nullable;
 
+import com.pinonzhyk.coinssnake.world.WorldObject;
+
 import java.util.Collection;
 
 public class RenderView extends View  {

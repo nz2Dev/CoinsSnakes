@@ -1,5 +1,9 @@
-package com.pinonzhyk.coinssnake;
+package com.pinonzhyk.coinssnake.world;
 
+/**
+ * Act as atomic game object which is both authoring and read-only state representation
+ * of the state of the world
+ */
 public class WorldObject {
 
     private int x;
@@ -13,7 +17,7 @@ public class WorldObject {
     private float startTime = -1;
     private int startX;
 
-    public void update(float time) {
+    protected void update(float time) {
         if (startTime == -1) {
             startTime = time;
             startX = x;

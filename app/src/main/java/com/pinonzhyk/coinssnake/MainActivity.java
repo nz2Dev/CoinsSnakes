@@ -4,6 +4,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 
+import com.pinonzhyk.coinssnake.world.Scene;
+import com.pinonzhyk.coinssnake.world.World;
+import com.pinonzhyk.coinssnake.world.WorldObject;
+
 import java.util.Arrays;
 import java.util.List;
 
