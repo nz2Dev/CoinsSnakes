@@ -3,6 +3,7 @@ package com.pinonzhyk.coinssnake;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -75,8 +76,8 @@ public class RenderView extends View  {
         for (WorldObject worldObject : renderObjects) {
             canvas.save();
             canvas.translate(
-                    worldObject.getX() * pixelsPerSceneUnit,
-                    worldObject.getY() * pixelsPerSceneUnit
+                    worldObject.position.x * pixelsPerSceneUnit,
+                    worldObject.position.y * pixelsPerSceneUnit
             );
             canvas.drawRect(
                     0,

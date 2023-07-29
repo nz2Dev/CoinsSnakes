@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 
+import com.pinonzhyk.coinssnake.game.Movable;
 import com.pinonzhyk.coinssnake.world.Scene;
 import com.pinonzhyk.coinssnake.world.World;
 import com.pinonzhyk.coinssnake.world.WorldObject;
@@ -20,8 +21,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         final RenderView renderView = findViewById(R.id.renderView);
+
+        final WorldObject movableObj = new WorldObject(25, 25);
+        movableObj.addLogicComponent(new Movable());
+
         final List<WorldObject> worldObjects = Arrays.asList(
-                new WorldObject(25, 25),
+                movableObj,
                 new WorldObject(25, 85)
         );
 

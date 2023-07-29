@@ -1,42 +1,51 @@
 package com.pinonzhyk.coinssnake.world;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Act as atomic game object which is both authoring and read-only state representation
  * of the state of the world
  */
 public class WorldObject {
 
-    private int x;
-    private int y;
+    public final IntVector2 position;
+    private final List<LogicComponent> logicComponents = new ArrayList<>();
 
     public WorldObject(int x, int y) {
-        this.x = x;
-        this.y = y;
+        this.position = new IntVector2(x, y);
     }
 
-    private float startTime = -1;
-    private int startX;
-
-    protected void update(float time) {
-        if (startTime == -1) {
-            startTime = time;
-            startX = x;
-            return;
+    public void addLogicComponent(LogicComponent logicComponent) {
+        if (logicComponents.contains(logicComponent)) {
+            throw new RuntimeException("component already exist: " + logicComponent);
         }
+        logicComponents.add(logicComponent);
+        logicComponent.attach(this);
+    }
 
-        float diff = time - startTime;
-        x = (int) (startX + diff * 200);
-        if (x > 1000) {
-            x = startX;
-            startTime = time;
+    protected void update(float timeSec) {
+        for (LogicComponent logicComponent : logicComponents) {
+            logicComponent.update(timeSec);
         }
     }
 
-    public int getX() {
-        return x;
-    }
+    public static abstract class LogicComponent {
 
-    public int getY() {
-        return y;
+        private WorldObject object;
+
+        private void attach(WorldObject holder) {
+            this.object = holder;
+        }
+
+        protected WorldObject object() {
+            return object;
+        }
+
+        private void update(float timeSec) {
+            onUpdate(timeSec);
+        }
+
+        protected abstract void onUpdate(float timeSec);
     }
 }
