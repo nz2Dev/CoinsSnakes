@@ -3,8 +3,8 @@ package com.pinonzhyk.coinssnake;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.Rect;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
 
 import androidx.annotation.Nullable;
@@ -20,6 +20,7 @@ public class RenderView extends View  {
     private Collection<WorldObject> renderObjects;
     private float pixelsPerSceneUnit;
     private Paint paint = new Paint();
+    private InputCallback inputCallback;
     private int fpsDebug;
     private Paint fpsPaint;
 
@@ -27,6 +28,10 @@ public class RenderView extends View  {
         super(context, attrs);
         fpsPaint = new Paint();
         fpsPaint.setTextSize(32);
+    }
+
+    public void setInputCallback(InputCallback inputCallback) {
+        this.inputCallback = inputCallback;
     }
 
     public void setVisibleBounds(int widthUnits, int heightUnits) {
@@ -44,6 +49,21 @@ public class RenderView extends View  {
     public void setFpsDebug(int fpsDebug) {
         this.fpsDebug = fpsDebug;
         invalidate();
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if (inputCallback == null) {
+            return false;
+        }
+
+        if (event.getAction() == MotionEvent.ACTION_UP) {
+            int x = (int) ((event.getX() / getWidth()) * visibleWidthUnit);
+            int y = (int) ((event.getY() / getHeight()) * visibleHeightUnit);
+            inputCallback.onClick(x, y);
+        }
+
+        return true;
     }
 
     @Override
@@ -80,10 +100,9 @@ public class RenderView extends View  {
                     worldObject.position.y * pixelsPerSceneUnit
             );
             canvas.drawRect(
-                    0,
-                    0,
-                    50 * pixelsPerSceneUnit,
-                    50 * pixelsPerSceneUnit,
+                    0, 0,
+                    worldObject.inputSurfaceSize.x * pixelsPerSceneUnit,
+                    worldObject.inputSurfaceSize.y * pixelsPerSceneUnit,
                     paint
             );
             canvas.restore();
@@ -95,5 +114,9 @@ public class RenderView extends View  {
         canvas.drawLine(0, 0, 0, height, paint);
         canvas.drawLine(width, 0, width, height, paint);
         canvas.drawLine(0, height, width, height, paint);
+    }
+
+    public interface InputCallback {
+        void onClick(int xPositionUnit, int yPositionUnit);
     }
 }

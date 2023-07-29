@@ -20,18 +20,21 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        final RenderView renderView = findViewById(R.id.renderView);
 
-        final WorldObject movableObj = new WorldObject(25, 25);
+        final WorldObject movableObj = new WorldObject(25, 25, 100, 100);
         movableObj.addLogicComponent(new Movable());
 
-        final List<WorldObject> worldObjects = Arrays.asList(
-                movableObj,
-                new WorldObject(25, 85)
-        );
+        final World world = new World(1000, 1000, new Scene(Arrays.asList(
+                new WorldObject(25, 85),
+                movableObj
+        )));
+        world.init();
 
-        final World world = new World(1000, 1000, new Scene(worldObjects));
+        final RenderView renderView = findViewById(R.id.renderView);
         renderView.setVisibleBounds(world.getBoundsWidthUnits(), world.getBoundsHeightUnits());
+        renderView.setInputCallback((xPositionUnit, yPositionUnit) -> {
+            world.handleClickInput(xPositionUnit, yPositionUnit);
+        });
 
         gameLoop = new GameLoop(true);
         gameLoop.setCallback((timeSec, deltaTime) -> {

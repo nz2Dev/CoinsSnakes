@@ -13,4 +13,13 @@ public final class IntVector2 {
         this.x = vector.x;
         this.y = vector.y;
     }
+
+    public boolean isZero() {
+        return x == 0 && y == 0;
+    }
+
+    public void set(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
 }

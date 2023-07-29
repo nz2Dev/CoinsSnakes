@@ -3,9 +3,10 @@ package com.pinonzhyk.coinssnake.game;
 import com.pinonzhyk.coinssnake.world.IntVector2;
 import com.pinonzhyk.coinssnake.world.WorldObject;
 
-public class Movable extends WorldObject.LogicComponent {
+public class Movable extends WorldObject.LogicComponent implements WorldObject.ClickEventReceiver {
     private float startTime = -1;
     private int startX;
+    private int speed = 200;
 
     @Override
     protected void onUpdate(float timeSec) {
@@ -18,10 +19,15 @@ public class Movable extends WorldObject.LogicComponent {
         }
 
         float diff = timeSec - startTime;
-        position.x = (int) (startX + diff * 200);
+        position.x = (int) (startX + diff * speed);
         if (position.x > 1000) {
             position.x = startX;
             startTime = timeSec;
         }
+    }
+
+    @Override
+    public void onClickEvent(int x, int y) {
+        speed += 50;
     }
 }
