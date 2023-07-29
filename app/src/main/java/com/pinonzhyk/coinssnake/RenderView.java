@@ -1,34 +1,40 @@
 package com.pinonzhyk.coinssnake;
 
-import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.os.Handler;
 import android.util.AttributeSet;
-import android.view.Choreographer;
 import android.view.View;
 
 import androidx.annotation.Nullable;
 
-public class SceneRenderer extends View  {
+import java.util.Collection;
 
-    private Scene scene;
+public class RenderView extends View  {
+
+    private int visibleWidthUnit;
+    private int visibleHeightUnit;
+    private Collection<WorldObject> renderObjects;
     private float pixelsPerSceneUnit;
     private Paint paint = new Paint();
     private int fpsDebug;
     private Paint fpsPaint;
 
-    public SceneRenderer(Context context, @Nullable AttributeSet attrs) {
+    public RenderView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         fpsPaint = new Paint();
         fpsPaint.setTextSize(32);
     }
 
-    public void setScene(Scene scene) {
-        this.scene = scene;
+    public void setVisibleBounds(int widthUnits, int heightUnits) {
+        this.visibleWidthUnit = widthUnits;
+        this.visibleHeightUnit = heightUnits;
         calculateUnitScale();
+        invalidate();
+    }
+
+    public void renderObjects(Collection<WorldObject> renderObjects) {
+        this.renderObjects = renderObjects;
         invalidate();
     }
 
@@ -40,14 +46,14 @@ public class SceneRenderer extends View  {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        if (scene != null) {
+        if (visibleWidthUnit != 0 && visibleHeightUnit != 0) {
             calculateUnitScale();
         }
     }
 
     private void calculateUnitScale() {
-        float widthScale = ((float) getWidth() / scene.getWidthUnits());
-        float heightScale = ((float) getHeight() / scene.getHeightUnits());
+        float widthScale = ((float) getWidth() / visibleWidthUnit);
+        float heightScale = ((float) getHeight() / visibleHeightUnit);
         pixelsPerSceneUnit = Math.min(widthScale, heightScale);
     }
 
@@ -58,17 +64,17 @@ public class SceneRenderer extends View  {
 
         // view borders
         drawLineSquare(canvas, getWidth(), getHeight(), paint);
-        // scene borders
+        // render borders
         drawLineSquare(canvas,
-                scene.getWidthUnits() * pixelsPerSceneUnit,
-                scene.getHeightUnits() * pixelsPerSceneUnit,
+                visibleWidthUnit * pixelsPerSceneUnit,
+                visibleHeightUnit * pixelsPerSceneUnit,
                 paint);
 
-        for (SceneObject sceneObject : scene.getSceneObjects()) {
+        for (WorldObject worldObject : renderObjects) {
             canvas.save();
             canvas.translate(
-                    sceneObject.getX() * pixelsPerSceneUnit,
-                    sceneObject.getY() * pixelsPerSceneUnit
+                    worldObject.getX() * pixelsPerSceneUnit,
+                    worldObject.getY() * pixelsPerSceneUnit
             );
             canvas.drawRect(
                     0,

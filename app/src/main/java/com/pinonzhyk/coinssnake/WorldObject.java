@@ -1,11 +1,11 @@
 package com.pinonzhyk.coinssnake;
 
-public class SceneObject {
+public class WorldObject {
 
     private int x;
     private int y;
 
-    public SceneObject(int x, int y) {
+    public WorldObject(int x, int y) {
         this.x = x;
         this.y = y;
     }

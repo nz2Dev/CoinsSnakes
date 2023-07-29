@@ -5,26 +5,14 @@ import java.util.List;
 
 public class Scene {
 
-    private int widthUnits;
-    private int heightUnits;
-    private List<SceneObject> sceneObjects;
+    private List<WorldObject> worldObjects;
 
-    public Scene(int widthUnits, int heightUnits, List<SceneObject> sceneObjects) {
-        this.widthUnits = widthUnits;
-        this.heightUnits = heightUnits;
-        this.sceneObjects = sceneObjects;
+    public Scene(List<WorldObject> worldObjects) {
+        this.worldObjects = worldObjects;
     }
 
-    public int getWidthUnits() {
-        return widthUnits;
-    }
-
-    public int getHeightUnits() {
-        return heightUnits;
-    }
-
-    public Collection<SceneObject> getSceneObjects() {
-        return sceneObjects;
+    public Collection<WorldObject> getAllObjects() {
+        return worldObjects;
     }
 
 }

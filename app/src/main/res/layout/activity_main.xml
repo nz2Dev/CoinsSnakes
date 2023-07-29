@@ -16,8 +16,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.pinonzhyk.coinssnake.SceneRenderer
-        android:id="@+id/sceneRenderer"
+    <com.pinonzhyk.coinssnake.RenderView
+        android:id="@+id/renderView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="16dp"

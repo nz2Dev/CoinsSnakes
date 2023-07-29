@@ -3,7 +3,6 @@ package com.pinonzhyk.coinssnake;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
-import android.view.Choreographer;
 
 import java.util.Arrays;
 import java.util.List;
@@ -16,22 +15,20 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        final SceneRenderer sceneRenderer = findViewById(R.id.sceneRenderer);
-        final List<SceneObject> sceneObjects = Arrays.asList(
-                new SceneObject(25, 25),
-                new SceneObject(25, 85)
+        final RenderView renderView = findViewById(R.id.renderView);
+        final List<WorldObject> worldObjects = Arrays.asList(
+                new WorldObject(25, 25),
+                new WorldObject(25, 85)
         );
 
-        final Scene scene = new Scene(1000, 1000, sceneObjects);
-        sceneRenderer.setScene(scene);
+        final World world = new World(1000, 1000, new Scene(worldObjects));
+        renderView.setVisibleBounds(world.getBoundsWidthUnits(), world.getBoundsHeightUnits());
 
         gameLoop = new GameLoop(true);
         gameLoop.setCallback((timeSec, deltaTime) -> {
-            for (SceneObject sceneObject : scene.getSceneObjects()) {
-                sceneObject.update(timeSec);
-            }
-            sceneRenderer.setScene(scene);
-            sceneRenderer.setFpsDebug(gameLoop.getFpsDebug());
+            world.update(timeSec, deltaTime);
+            renderView.renderObjects(world.getObjects());
+            renderView.setFpsDebug(gameLoop.getFpsDebug());
         });
         gameLoop.start();
     }
