@@ -1,17 +1,20 @@
 package com.pinonzhyk.coinssnake.world;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public class World {
     private final int boundsWidthUnits;
     private final int boundsHeightUnits;
     private final Scene scene;
-    private ClickEventsListener clickEventsListener;
+    private final List<System> systems;
 
     public World(int boundsWidthUnits, int boundsHeightUnits) {
         this.boundsWidthUnits = boundsWidthUnits;
         this.boundsHeightUnits = boundsHeightUnits;
         this.scene = new Scene();
+        this.systems = new ArrayList<>();
     }
 
     public int getBoundsWidthUnits() {
@@ -20,6 +23,23 @@ public class World {
 
     public int getBoundsHeightUnits() {
         return boundsHeightUnits;
+    }
+
+    public void addSystem(System system) {
+        if (systems.contains(system)) {
+            throw new RuntimeException("already contains: " + system);
+        }
+        systems.add(system);
+        system.attach(this);
+    }
+
+    public <T extends System> T findSystem(Class<T> type) {
+        for (System system : systems) {
+            if (type.isAssignableFrom(system.getClass())) {
+                return (T) system;
+            }
+        }
+        return null;
     }
 
     public void instantiateWorldObject(WorldObject object) {
@@ -31,10 +51,6 @@ public class World {
 
     public Collection<WorldObject> getObjects() {
         return scene.getAllObjects();
-    }
-
-    public void setClickEventsListener(ClickEventsListener clickEventsListener) {
-        this.clickEventsListener = clickEventsListener;
     }
 
     public void handleClickInput(int x, int y) {
@@ -54,8 +70,11 @@ public class World {
             }
         }
 
-        if (clickEventsListener != null) {
-            clickEventsListener.onClickEvent(eventReceiver, x, y);
+        for (System system : systems) {
+            if (system instanceof InputSystem) {
+                InputSystem inputSystem = (InputSystem) system;
+                inputSystem.onClick(eventReceiver, x, y);
+            }
         }
     }
 
@@ -63,10 +82,29 @@ public class World {
         for (WorldObject worldObject : scene.getAllObjects()) {
             worldObject.update(timeSec);
         }
+
+        for (System system : systems) {
+            if (system instanceof UpdateSystem) {
+                ((UpdateSystem) system).onUpdate(timeSec, deltaTime);
+            }
+        }
     }
 
-    public interface ClickEventsListener {
-        void onClickEvent(WorldObject receiver, int x, int y);
+    public static abstract class System {
+        private World world;
+        private void attach(World world) {
+            this.world = world;
+        }
+        protected World world() {
+            return world;
+        }
     }
 
+    public interface UpdateSystem {
+        void onUpdate(float timeSec, float deltaTime);
+    }
+
+    public interface InputSystem {
+        void onClick(WorldObject receiver, int x, int y);
+    }
 }

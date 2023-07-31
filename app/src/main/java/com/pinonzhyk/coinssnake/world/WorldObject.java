@@ -37,6 +37,16 @@ public class WorldObject {
         logicComponent.attach(this);
     }
 
+    public <T extends LogicComponent> boolean hasLogicComponent(Class<T> type) {
+        // todo optimize using hashMap
+        for (LogicComponent logicComponent : logicComponents) {
+            if (type.isAssignableFrom(logicComponent.getClass())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     protected void init() {
         for (LogicComponent logicComponent : logicComponents) {
             logicComponent.init();

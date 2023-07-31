@@ -4,7 +4,10 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.pinonzhyk.coinssnake.game.EconomySystem;
+import com.pinonzhyk.coinssnake.game.FlowerPlantSystem;
 import com.pinonzhyk.coinssnake.game.Movable;
+import com.pinonzhyk.coinssnake.game.SnakeSpawnSystem;
 import com.pinonzhyk.coinssnake.world.World;
 import com.pinonzhyk.coinssnake.world.WorldObject;
 
@@ -33,14 +36,9 @@ public class MainViewModel extends ViewModel {
 
     private void createGame() {
         final World gameWorld = new World(1000, 1000);
-        final WorldObject movableObj = new WorldObject(25, 25, 100, 100);
-        movableObj.addLogicComponent(new Movable());
-        gameWorld.instantiateWorldObject(movableObj);
-        gameWorld.setClickEventsListener((receiver, x, y) -> {
-            if (receiver == null) {
-                gameWorld.instantiateWorldObject(new WorldObject(x, y, 50, 50));
-            }
-        });
+        gameWorld.addSystem(new EconomySystem(150));
+        gameWorld.addSystem(new FlowerPlantSystem(50));
+        gameWorld.addSystem(new SnakeSpawnSystem());
         worldData.postValue(gameWorld);
     }
 
