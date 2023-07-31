@@ -9,58 +9,66 @@ import android.view.View;
 
 import androidx.annotation.Nullable;
 
+import com.pinonzhyk.coinssnake.world.World;
 import com.pinonzhyk.coinssnake.world.WorldObject;
 
 import java.util.Collection;
+import java.util.Collections;
 
-public class RenderView extends View  {
+public class GameView extends View implements GameLoop.Callback {
 
-    private int visibleWidthUnit;
-    private int visibleHeightUnit;
-    private Collection<WorldObject> renderObjects;
+    private World world;
     private float pixelsPerSceneUnit;
-    private Paint paint = new Paint();
-    private InputCallback inputCallback;
-    private int fpsDebug;
-    private Paint fpsPaint;
 
-    public RenderView(Context context, @Nullable AttributeSet attrs) {
+    private final GameLoop gameLoop;
+    private final Paint fpsPaint;
+    private final Paint paint;
+
+    public GameView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
+        paint = new Paint();
         fpsPaint = new Paint();
         fpsPaint.setTextSize(32);
+        gameLoop = new GameLoop(true);
+        gameLoop.setCallback(this);
     }
 
-    public void setInputCallback(InputCallback inputCallback) {
-        this.inputCallback = inputCallback;
-    }
-
-    public void setVisibleBounds(int widthUnits, int heightUnits) {
-        this.visibleWidthUnit = widthUnits;
-        this.visibleHeightUnit = heightUnits;
+    public void setWorld(World world) {
+        this.world = world;
         calculateUnitScale();
         invalidate();
     }
 
-    public void renderObjects(Collection<WorldObject> renderObjects) {
-        this.renderObjects = renderObjects;
-        invalidate();
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        gameLoop.start();
     }
 
-    public void setFpsDebug(int fpsDebug) {
-        this.fpsDebug = fpsDebug;
-        invalidate();
+    @Override
+    public void onFrame(float timeSec, float deltaTime) {
+        if (world != null) {
+            world.update(timeSec, deltaTime);
+            invalidate();
+        }
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        gameLoop.stop();
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (inputCallback == null) {
+        if (world == null) {
             return false;
         }
 
         if (event.getAction() == MotionEvent.ACTION_UP) {
             int x = pixelPositionToUnit(event.getX());
             int y = pixelPositionToUnit(event.getY());
-            inputCallback.onClick(x, y);
+            world.handleClickInput(x, y);
         }
 
         return true;
@@ -73,31 +81,34 @@ public class RenderView extends View  {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        if (visibleWidthUnit != 0 && visibleHeightUnit != 0) {
+        if (world != null) {
             calculateUnitScale();
         }
     }
 
     private void calculateUnitScale() {
-        float widthScale = ((float) getWidth() / visibleWidthUnit);
-        float heightScale = ((float) getHeight() / visibleHeightUnit);
+        float widthScale = ((float) getWidth() / world.getBoundsWidthUnits());
+        float heightScale = ((float) getHeight() / world.getBoundsHeightUnits());
         pixelsPerSceneUnit = Math.min(widthScale, heightScale);
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        canvas.drawText("FPS: " + fpsDebug, 50, 74, fpsPaint);
-
+        canvas.drawText("FPS: " + gameLoop.getFpsDebug(), 50, 74, fpsPaint);
         // view borders
         drawLineSquare(canvas, getWidth(), getHeight(), paint);
-        // render borders
+
+        if (world == null) {
+            return;
+        }
+        // world borders
         drawLineSquare(canvas,
-                visibleWidthUnit * pixelsPerSceneUnit,
-                visibleHeightUnit * pixelsPerSceneUnit,
+                world.getBoundsWidthUnits() * pixelsPerSceneUnit,
+                world.getBoundsHeightUnits() * pixelsPerSceneUnit,
                 paint);
 
-        for (WorldObject worldObject : renderObjects) {
+        for (WorldObject worldObject : world.getObjects()) {
             canvas.save();
             canvas.translate(
                     worldObject.position.x * pixelsPerSceneUnit,
@@ -122,9 +133,5 @@ public class RenderView extends View  {
         canvas.drawLine(0, 0, 0, height, paint);
         canvas.drawLine(width, 0, width, height, paint);
         canvas.drawLine(0, height, width, height, paint);
-    }
-
-    public interface InputCallback {
-        void onClick(int xPositionUnit, int yPositionUnit);
     }
 }

@@ -3,8 +3,8 @@ package com.pinonzhyk.coinssnake.world;
 import java.util.Collection;
 
 public class World {
-    private int boundsWidthUnits;
-    private int boundsHeightUnits;
+    private final int boundsWidthUnits;
+    private final int boundsHeightUnits;
     private final Scene scene;
     private ClickEventsListener clickEventsListener;
 

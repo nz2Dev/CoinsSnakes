@@ -1,45 +1,42 @@
 package com.pinonzhyk.coinssnake;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.os.Bundle;
-
-import com.pinonzhyk.coinssnake.game.GameManager;
-import com.pinonzhyk.coinssnake.world.World;
+import android.widget.EditText;
 
 public class MainActivity extends AppCompatActivity {
 
-    private GameLoop gameLoop;
-    private GameManager gameManager;
+    private GameView gameView;
+    private MainViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        gameView = findViewById(R.id.renderView);
 
-        gameManager = new GameManager();
-        gameManager.createGame();
-
-        final World world = gameManager.getGameWorld();
-        final RenderView renderView = findViewById(R.id.renderView);
-        renderView.setVisibleBounds(world.getBoundsWidthUnits(), world.getBoundsHeightUnits());
-        renderView.setInputCallback((xPositionUnit, yPositionUnit) -> {
-            world.handleClickInput(xPositionUnit, yPositionUnit);
+        viewModel = new ViewModelProvider(this).get(MainViewModel.class);
+        viewModel.getWorldData().observe(this, world -> {
+            gameView.setWorld(world);
         });
-
-        gameLoop = new GameLoop(true);
-        gameLoop.setCallback((timeSec, deltaTime) -> {
-            world.update(timeSec, deltaTime);
-            renderView.renderObjects(world.getObjects());
-            renderView.setFpsDebug(gameLoop.getFpsDebug());
+        viewModel.getDialogData().observe(this, integer -> {
+            showPlayerNameDialog();
         });
-        gameLoop.start();
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        gameLoop.setCallback(null);
-        gameLoop.stop();
+    private void showPlayerNameDialog() {
+        final EditText inputText = new EditText(this);
+        new AlertDialog.Builder(this)
+                .setView(inputText)
+                .setTitle("Enter Player Name")
+                .setPositiveButton("Create", (dialog, which) -> {
+                    viewModel.playerNameEntered(inputText.getText().toString());
+                })
+                .create()
+                .show();
     }
+
 }
