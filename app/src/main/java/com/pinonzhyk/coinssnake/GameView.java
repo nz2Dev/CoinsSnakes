@@ -9,6 +9,7 @@ import android.view.View;
 
 import androidx.annotation.Nullable;
 
+import com.pinonzhyk.coinssnake.world.TextComponent;
 import com.pinonzhyk.coinssnake.world.World;
 import com.pinonzhyk.coinssnake.world.WorldObject;
 
@@ -23,12 +24,14 @@ public class GameView extends View implements GameLoop.Callback {
     private final GameLoop gameLoop;
     private final Paint fpsPaint;
     private final Paint paint;
+    private final Paint textComponentPaint;
 
     public GameView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         paint = new Paint();
         fpsPaint = new Paint();
         fpsPaint.setTextSize(32);
+        textComponentPaint = new Paint();
         gameLoop = new GameLoop(true);
         gameLoop.setCallback(this);
     }
@@ -124,6 +127,15 @@ public class GameView extends View implements GameLoop.Callback {
                     halfSurfaceY * pixelsPerSceneUnit,
                     paint
             );
+
+            for (WorldObject.Component component : worldObject.getComponents()) {
+                if (component instanceof TextComponent) {
+                    TextComponent textComponent = ((TextComponent) component);
+                    textComponentPaint.setTextSize(textComponent.textSize * pixelsPerSceneUnit);
+                    canvas.drawText(textComponent.text, 0, 0, textComponentPaint);
+                }
+            }
+
             canvas.restore();
         }
     }

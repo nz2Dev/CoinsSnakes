@@ -2,10 +2,6 @@ package com.pinonzhyk.coinssnake.game;
 
 import com.pinonzhyk.coinssnake.world.WorldObject;
 
-public class Flower extends WorldObject.LogicComponent {
+public class Flower extends WorldObject.Component {
 
-    @Override
-    protected void onUpdate(float timeSec) {
-
-    }
 }

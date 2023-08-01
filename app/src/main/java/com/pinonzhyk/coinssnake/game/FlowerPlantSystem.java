@@ -19,7 +19,7 @@ public class FlowerPlantSystem extends World.System implements World.InputSystem
                 economySystem.spend(flowerPrice);
 
                 WorldObject flower = new WorldObject(x, y, 50, 50);
-                flower.addLogicComponent(new Flower());
+                flower.addComponent(new Flower());
                 world().instantiateWorldObject(flower);
             }
         }

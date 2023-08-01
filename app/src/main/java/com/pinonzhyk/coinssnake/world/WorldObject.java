@@ -1,6 +1,7 @@
 package com.pinonzhyk.coinssnake.world;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -17,7 +18,7 @@ public class WorldObject {
      */
     public final IntVector2 inputSurfaceSize ;
     public final IntVector2 position;
-    private final List<LogicComponent> logicComponents = new ArrayList<>();
+    private final List<Component> components = new ArrayList<>();
 
     public WorldObject(int x, int y) {
         this.position = new IntVector2(x, y);
@@ -29,47 +30,53 @@ public class WorldObject {
         this.inputSurfaceSize = new IntVector2(surfaceSizeX, surfaceSizeY);
     }
 
-    public void addLogicComponent(LogicComponent logicComponent) {
-        if (logicComponents.contains(logicComponent)) {
-            throw new RuntimeException("component already exist: " + logicComponent);
+    public void addComponent(Component component) {
+        if (components.contains(component)) {
+            throw new RuntimeException("component already exist: " + component);
         }
-        logicComponents.add(logicComponent);
-        logicComponent.attach(this);
+        components.add(component);
+        component.attach(this);
     }
 
-    public <T extends LogicComponent> boolean hasLogicComponent(Class<T> type) {
+    public <T extends Component> boolean hasComponent(Class<T> type) {
         // todo optimize using hashMap
-        for (LogicComponent logicComponent : logicComponents) {
-            if (type.isAssignableFrom(logicComponent.getClass())) {
+        for (Component component : components) {
+            if (type.isAssignableFrom(component.getClass())) {
                 return true;
             }
         }
         return false;
     }
 
+    public Collection<Component> getComponents() {
+        // todo should return some read-only collection
+        return components;
+    }
+
     protected void init() {
-        for (LogicComponent logicComponent : logicComponents) {
-            logicComponent.init();
+        for (Component component : components) {
+            component.init();
         }
     }
 
     protected void update(float timeSec) {
-        for (LogicComponent logicComponent : logicComponents) {
-            logicComponent.update(timeSec);
+        for (Component component : components) {
+            if (component instanceof LogicUpdateReceiver) {
+                ((LogicUpdateReceiver) component).onUpdate(timeSec);
+            }
         }
     }
 
     protected void receiveClickEvent(int x, int y) {
-        for (LogicComponent logicComponent : logicComponents) {
-            if (logicComponent instanceof ClickEventReceiver) {
-                ClickEventReceiver receiver = (ClickEventReceiver) logicComponent;
+        for (Component component : components) {
+            if (component instanceof ClickEventReceiver) {
+                ClickEventReceiver receiver = (ClickEventReceiver) component;
                 receiver.onClickEvent(x, y);
             }
         }
     }
 
-    public static abstract class LogicComponent {
-
+    public static class Component {
         private WorldObject object;
 
         private void attach(WorldObject holder) {
@@ -86,12 +93,10 @@ public class WorldObject {
 
         protected void onInit() {
         }
+    }
 
-        private void update(float timeSec) {
-            onUpdate(timeSec);
-        }
-
-        protected abstract void onUpdate(float timeSec);
+    public interface LogicUpdateReceiver {
+        void onUpdate(float timeSec);
     }
 
     public interface ClickEventReceiver {

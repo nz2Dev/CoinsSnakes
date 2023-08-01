@@ -1,15 +1,15 @@
 package com.pinonzhyk.coinssnake.game;
 
 import com.pinonzhyk.coinssnake.world.IntVector2;
-import com.pinonzhyk.coinssnake.world.WorldObject;
+import com.pinonzhyk.coinssnake.world.WorldObject.*;
 
-public class Movable extends WorldObject.LogicComponent implements WorldObject.ClickEventReceiver {
+public class Movable extends Component implements LogicUpdateReceiver, ClickEventReceiver {
     private float startTime = -1;
     private int startX;
     private int speed = 200;
 
     @Override
-    protected void onUpdate(float timeSec) {
+    public void onUpdate(float timeSec) {
         final IntVector2 position = object().position;
 
         if (startTime == -1) {

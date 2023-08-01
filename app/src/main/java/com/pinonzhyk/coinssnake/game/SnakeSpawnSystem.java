@@ -15,7 +15,7 @@ public class SnakeSpawnSystem extends World.System implements World.UpdateSystem
 
         boolean worldContainFlower = false;
         for (WorldObject object : world().getObjects()) {
-            if (object.hasLogicComponent(Flower.class)) {
+            if (object.hasComponent(Flower.class)) {
                 worldContainFlower = true;
                 break;
             }
@@ -23,7 +23,7 @@ public class SnakeSpawnSystem extends World.System implements World.UpdateSystem
 
         if (worldContainFlower) {
             WorldObject snake = new WorldObject(25, 25, 100, 50);
-            snake.addLogicComponent(new Movable());
+            snake.addComponent(new Movable());
             world().instantiateWorldObject(snake);
             snakeSpawned = true;
         }
