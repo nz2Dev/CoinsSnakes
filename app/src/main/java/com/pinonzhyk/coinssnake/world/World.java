@@ -45,7 +45,7 @@ public class World {
     public void instantiateWorldObject(WorldObject object) {
         if (!scene.contains(object)) {
             scene.addObject(object);
-            object.init();
+            object.init(this);
         }
     }
 

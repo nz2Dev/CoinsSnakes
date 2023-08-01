@@ -22,4 +22,25 @@ public final class IntVector2 {
         this.x = x;
         this.y = y;
     }
+
+    public void set(IntVector2 vector2) {
+        this.x = vector2.x;
+        this.y = vector2.y;
+    }
+
+    public IntVector2 add(IntVector2 other) {
+        return new IntVector2(other.x + this.x, other.y + this.y);
+    }
+
+    public IntVector2 neg() {
+        return new IntVector2(-x, -y);
+    }
+
+    @Override
+    public String toString() {
+        return "IntVector2{" +
+                "x=" + x +
+                ", y=" + y +
+                '}';
+    }
 }

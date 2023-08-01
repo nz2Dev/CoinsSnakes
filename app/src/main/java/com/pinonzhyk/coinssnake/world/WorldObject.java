@@ -19,6 +19,7 @@ public class WorldObject {
     public final IntVector2 inputSurfaceSize ;
     public final IntVector2 position;
     private final List<Component> components = new ArrayList<>();
+    private World world;
 
     public WorldObject(int x, int y) {
         this.position = new IntVector2(x, y);
@@ -53,7 +54,8 @@ public class WorldObject {
         return components;
     }
 
-    protected void init() {
+    protected void init(World world) {
+        this.world = world;
         for (Component component : components) {
             component.init();
         }
@@ -85,6 +87,9 @@ public class WorldObject {
 
         protected WorldObject object() {
             return object;
+        }
+        protected World world() {
+            return object.world;
         }
 
         private void init() {
