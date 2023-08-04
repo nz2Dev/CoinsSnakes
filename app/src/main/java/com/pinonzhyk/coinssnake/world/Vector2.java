@@ -1,18 +1,18 @@
 package com.pinonzhyk.coinssnake.world;
 
-public final class IntVector2 {
-    public int x;
-    public int y;
+public final class Vector2 {
+    public float x;
+    public float y;
 
-    public IntVector2() {
+    public Vector2() {
     }
 
-    public IntVector2(int x, int y) {
+    public Vector2(float x, float y) {
         this.x = x;
         this.y = y;
     }
 
-    public IntVector2(IntVector2 vector) {
+    public Vector2(Vector2 vector) {
         this.x = vector.x;
         this.y = vector.y;
     }
@@ -21,12 +21,12 @@ public final class IntVector2 {
         return x == 0 && y == 0;
     }
 
-    public void set(int x, int y) {
+    public void set(float x, float y) {
         this.x = x;
         this.y = y;
     }
 
-    public void set(IntVector2 vector2) {
+    public void set(Vector2 vector2) {
         this.x = vector2.x;
         this.y = vector2.y;
     }

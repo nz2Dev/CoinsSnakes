@@ -35,7 +35,7 @@ public class MainViewModel extends ViewModel {
     }
 
     private void createGame() {
-        final World gameWorld = new World(1000, 1000);
+        final World gameWorld = new World(10, 10);
         gameWorld.addSystem(new EconomySystem(150));
         gameWorld.addSystem(new FlowerPlantSystem(50));
         gameWorld.addSystem(new SnakeSpawnSystem());

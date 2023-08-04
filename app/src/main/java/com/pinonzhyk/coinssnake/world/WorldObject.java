@@ -16,19 +16,19 @@ public class WorldObject {
      * center point is half of the vector size.
      * Can't be negative.
      */
-    public final IntVector2 inputSurfaceSize ;
-    public final IntVector2 position;
+    public final Vector2 inputSurfaceSize;
+    public final Vector2 position;
     private final List<Component> components = new ArrayList<>();
     private World world;
 
-    public WorldObject(int x, int y) {
-        this.position = new IntVector2(x, y);
-        this.inputSurfaceSize = new IntVector2(0, 0);
+    public WorldObject(float x, float y) {
+        this.position = new Vector2(x, y);
+        this.inputSurfaceSize = new Vector2();
     }
 
-    public WorldObject(int x, int y, int surfaceSizeX, int surfaceSizeY) {
-        this.position = new IntVector2(x, y);
-        this.inputSurfaceSize = new IntVector2(surfaceSizeX, surfaceSizeY);
+    public WorldObject(float x, float y, float surfaceSizeX, float surfaceSizeY) {
+        this.position = new Vector2(x, y);
+        this.inputSurfaceSize = new Vector2(surfaceSizeX, surfaceSizeY);
     }
 
     public void addComponent(Component component) {
@@ -69,7 +69,7 @@ public class WorldObject {
         }
     }
 
-    protected void receiveClickEvent(int x, int y) {
+    protected void receiveClickEvent(float x, float y) {
         for (Component component : components) {
             if (component instanceof ClickEventReceiver) {
                 ClickEventReceiver receiver = (ClickEventReceiver) component;
@@ -117,6 +117,6 @@ public class WorldObject {
     }
 
     public interface ClickEventReceiver {
-        void onClickEvent(int x, int y);
+        void onClickEvent(float x, float y);
     }
 }

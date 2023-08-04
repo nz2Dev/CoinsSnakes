@@ -28,12 +28,12 @@ public class EconomySystem extends World.System implements World.UpdateSystem {
     @Override
     public void onUpdate(float timeSec, float deltaTime) {
         if (moneyText == null) {
-            int x = (int) (world().getBoundsWidthUnits() * 0.8f);
-            int y = (int) (world().getBoundsHeightUnits() * 0.075f);
+            float x = world().getBoundsWidthUnits() * 0.8f;
+            float y = world().getBoundsHeightUnits() * 0.075f;
 
             moneyText = new TextComponent();
             //2.5% of the horizontal space for 1 character
-            moneyText.textSize = (int) (world().getBoundsWidthUnits() * 0.025f);
+            moneyText.textSize = world().getBoundsWidthUnits() * 0.025f;
             final WorldObject moneyTextObj = new WorldObject(x, y);
             moneyTextObj.addComponent(moneyText);
 

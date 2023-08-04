@@ -56,17 +56,17 @@ public class World {
         return scene.getAllObjects();
     }
 
-    public void handleClickInput(int x, int y) {
+    public void handleClickInput(float xUnits, float yUnits) {
         WorldObject eventReceiver = null;
         for (WorldObject worldObject : scene.getAllObjects()) {
             if (!worldObject.inputSurfaceSize.isZero()) {
-                int halfSurfaceX = worldObject.inputSurfaceSize.x / 2;
-                int halfSurfaceY = worldObject.inputSurfaceSize.y / 2;
-                if (x > worldObject.position.x - halfSurfaceX
-                        && x < worldObject.position.x + halfSurfaceX
-                        && y > worldObject.position.y - halfSurfaceY
-                        && y < worldObject.position.y + halfSurfaceY) {
-                    worldObject.receiveClickEvent(x, y);
+                float halfSurfaceX = worldObject.inputSurfaceSize.x / 2f;
+                float halfSurfaceY = worldObject.inputSurfaceSize.y / 2f;
+                if (xUnits > worldObject.position.x - halfSurfaceX
+                        && xUnits < worldObject.position.x + halfSurfaceX
+                        && yUnits > worldObject.position.y - halfSurfaceY
+                        && yUnits < worldObject.position.y + halfSurfaceY) {
+                    worldObject.receiveClickEvent(xUnits, yUnits);
                     eventReceiver = worldObject;
                     break;
                 }
@@ -76,7 +76,7 @@ public class World {
         for (System system : systems) {
             if (system instanceof InputSystem) {
                 InputSystem inputSystem = (InputSystem) system;
-                inputSystem.onClick(eventReceiver, x, y);
+                inputSystem.onClick(eventReceiver, xUnits, yUnits);
             }
         }
     }
@@ -127,6 +127,6 @@ public class World {
     }
 
     public interface InputSystem {
-        void onClick(WorldObject receiver, int x, int y);
+        void onClick(WorldObject receiver, float x, float y);
     }
 }

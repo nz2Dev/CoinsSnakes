@@ -23,7 +23,8 @@ public class SnakeSpawnSystem extends World.System implements World.UpdateSystem
         }
 
         if (worldContainFlower) {
-            WorldObject snake = new WorldObject(25, 25);
+            float startCoord = world().getBoundsWidthUnits() * 0.1f;
+            WorldObject snake = new WorldObject(startCoord, startCoord);
             spawned = new Snake();
             snake.addComponent(spawned);
             world().instantiateWorldObject(snake);
@@ -32,7 +33,7 @@ public class SnakeSpawnSystem extends World.System implements World.UpdateSystem
     }
 
     @Override
-    public void onClick(WorldObject receiver, int x, int y) {
+    public void onClick(WorldObject receiver, float x, float y) {
         if (receiver == null && spawned != null) {
             spawned.changeDirection();
         }

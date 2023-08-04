@@ -69,16 +69,16 @@ public class GameView extends View implements GameLoop.Callback {
         }
 
         if (event.getAction() == MotionEvent.ACTION_UP) {
-            int x = pixelPositionToUnit(event.getX());
-            int y = pixelPositionToUnit(event.getY());
+            float x = pixelPositionToUnit(event.getX());
+            float y = pixelPositionToUnit(event.getY());
             world.handleClickInput(x, y);
         }
 
         return true;
     }
 
-    private int pixelPositionToUnit(float pixelCoord) {
-        return (int) (pixelCoord / pixelsPerSceneUnit);
+    private float pixelPositionToUnit(float pixelCoord) {
+        return pixelCoord / pixelsPerSceneUnit;
     }
 
     @Override
@@ -118,8 +118,8 @@ public class GameView extends View implements GameLoop.Callback {
                     worldObject.position.y * pixelsPerSceneUnit
             );
 
-            int halfSurfaceX = worldObject.inputSurfaceSize.x / 2;
-            int halfSurfaceY = worldObject.inputSurfaceSize.y / 2;
+            float halfSurfaceX = worldObject.inputSurfaceSize.x / 2f;
+            float halfSurfaceY = worldObject.inputSurfaceSize.y / 2f;
             canvas.drawRect(
                     -halfSurfaceX * pixelsPerSceneUnit,
                     -halfSurfaceY * pixelsPerSceneUnit,

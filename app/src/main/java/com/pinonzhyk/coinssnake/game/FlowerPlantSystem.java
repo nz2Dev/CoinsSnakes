@@ -12,13 +12,14 @@ public class FlowerPlantSystem extends World.System implements World.InputSystem
     }
 
     @Override
-    public void onClick(WorldObject receiver, int x, int y) {
+    public void onClick(WorldObject receiver, float x, float y) {
         if (receiver == null) {
             final EconomySystem economySystem = world().findSystem(EconomySystem.class);
             if (economySystem.canAfford(flowerPrice)) {
                 economySystem.spend(flowerPrice);
 
-                WorldObject flower = new WorldObject(x, y, 50, 50);
+                final float size = world().getBoundsWidthUnits() * 0.1f;
+                WorldObject flower = new WorldObject(x, y, size, size);
                 flower.addComponent(new Flower());
                 world().instantiateWorldObject(flower);
             }
