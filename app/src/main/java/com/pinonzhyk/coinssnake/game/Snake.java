@@ -19,32 +19,26 @@ public class Snake extends WorldObject.Component implements WorldObject.UpdateRe
     protected void onInit() {
         path = new LinkedList<>();
         tails = new ArrayList<>();
-
         path.add(object().position);
-        path.add(object().position.add(new IntVector2(-5, 0)));
-        path.add(object().position.add(new IntVector2(-10, 0)));
-        path.add(object().position.add(new IntVector2(-15, 0)));
-        path.add(object().position.add(new IntVector2(-20, 0)));
-        path.add(object().position.add(new IntVector2(-25, 0)));
-        path.add(object().position.add(new IntVector2(-30, 0)));
-        path.add(object().position.add(new IntVector2(-35, 0)));
-        path.add(object().position.add(new IntVector2(-40, 0)));
+        setTailsCapacity(2);
+    }
 
-        final WorldObject tail = new WorldObject(0, 0, 10, 10);
-        world().instantiateWorldObject(tail);
-        tails.add(tail);
-        final WorldObject tail1 = new WorldObject(0, 0, 10, 10);
-        world().instantiateWorldObject(tail1);
-        tails.add(tail1);
-        final WorldObject tail2 = new WorldObject(0, 0, 10, 10);
-        world().instantiateWorldObject(tail2);
-        tails.add(tail2);
+    private void setTailsCapacity(int capacity) {
+        if (tails.size() < capacity) {
+            final int newTailsCount = capacity - tails.size();
+            for (int i = 0; i < newTailsCount; i++) {
+                final WorldObject tail = new WorldObject(0, 0, 10, 10);
+                world().instantiateWorldObject(tail);
+                tails.add(tail);
+            }
+        }
     }
 
     public void changeDirection() {
         direction ++;
         direction = direction % 3;
         speed += 5;
+        setTailsCapacity((int) (speed / 15));
     }
 
     @Override
@@ -53,7 +47,8 @@ public class Snake extends WorldObject.Component implements WorldObject.UpdateRe
         double yStep = direction == 1 || direction == 2 ? 1 : 0;
         float delta = (float) Math.ceil(deltaTimeStep * speed);
 
-        IntVector2 newPoint = object().position.add(
+        // todo refactor vector math to be static methods with value type params
+        final IntVector2 newPoint = object().position.add(
                 new IntVector2((int) (xStep * delta), (int) (yStep * delta)));
         object().position.set(newPoint);
 
@@ -76,6 +71,13 @@ public class Snake extends WorldObject.Component implements WorldObject.UpdateRe
             pointIndex++;
         }
 
+        // if tails is not counted to the end
+        if (tailIndex < tails.size() - 1 && !path.isEmpty()) {
+            final IntVector2 lastPoint = path.getLast();
+            for (; tailIndex < tails.size(); tailIndex++) {
+                tails.get(tailIndex).position.set(lastPoint);
+            }
+        }
     }
 
 }
