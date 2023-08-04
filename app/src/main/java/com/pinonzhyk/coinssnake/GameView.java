@@ -19,12 +19,15 @@ import java.util.Collections;
 
 public class GameView extends View implements GameLoop.Callback {
 
+    private static final boolean DEBUG_DRAW_INPUT_SURFACE = true;
+
     private World world;
     private float pixelsPerSceneUnit;
 
     private final GameLoop gameLoop;
     private final Paint fpsPaint;
     private final Paint paint;
+    private final Paint inputSurfacePaint;
     private final Paint textComponentPaint;
 
     public GameView(Context context, @Nullable AttributeSet attrs) {
@@ -33,6 +36,8 @@ public class GameView extends View implements GameLoop.Callback {
         fpsPaint = new Paint();
         fpsPaint.setTextSize(32);
         textComponentPaint = new Paint();
+        inputSurfacePaint = new Paint();
+        inputSurfacePaint.setAlpha((int) (256 * 0.1f));
         gameLoop = new GameLoop(true);
         gameLoop.setCallback(this);
     }
@@ -118,6 +123,18 @@ public class GameView extends View implements GameLoop.Callback {
                     worldObject.position.x * pixelsPerSceneUnit,
                     worldObject.position.y * pixelsPerSceneUnit
             );
+
+            if (DEBUG_DRAW_INPUT_SURFACE) {
+                float halfSurfaceX = worldObject.inputSurfaceSize.x / 2f;
+                float halfSurfaceY = worldObject.inputSurfaceSize.y / 2f;
+                canvas.drawRect(
+                        -halfSurfaceX * pixelsPerSceneUnit,
+                        -halfSurfaceY * pixelsPerSceneUnit,
+                        halfSurfaceX * pixelsPerSceneUnit,
+                        halfSurfaceY * pixelsPerSceneUnit,
+                        inputSurfacePaint
+                );
+            }
 
             for (WorldObject.Component component : worldObject.getComponents()) {
                 if (component instanceof TextComponent) {

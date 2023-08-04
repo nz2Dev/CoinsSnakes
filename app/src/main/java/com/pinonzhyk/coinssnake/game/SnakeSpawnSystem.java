@@ -5,15 +5,11 @@ import com.pinonzhyk.coinssnake.world.WorldObject;
 
 public class SnakeSpawnSystem extends World.System implements World.UpdateSystem {
 
-    private boolean snakeSpawned = false;
-    private Snake spawned;
+    private float lastSpawnTime;
+    private float spawnInterval = 3f;
 
     @Override
     public void onUpdate(float timeSec, float deltaTime) {
-        if (snakeSpawned) {
-            return;
-        }
-
         boolean worldContainFlower = false;
         for (WorldObject object : world().getObjects()) {
             if (object.hasComponent(Flower.class)) {
@@ -22,13 +18,17 @@ public class SnakeSpawnSystem extends World.System implements World.UpdateSystem
             }
         }
 
-        if (worldContainFlower) {
-            float startCoord = world().getBoundsWidthUnits() * 0.1f;
-            WorldObject snake = new WorldObject(startCoord, startCoord);
-            spawned = new Snake();
-            snake.addComponent(spawned);
-            world().instantiateWorldObject(snake);
-            snakeSpawned = true;
+        if (!worldContainFlower) {
+            return;
         }
+        if (lastSpawnTime + spawnInterval > timeSec) {
+            return;
+        }
+
+        lastSpawnTime = timeSec;
+        float startCoord = world().getBoundsWidthUnits() * 0.1f;
+        WorldObject snake = new WorldObject(startCoord, startCoord);
+        snake.addComponent(new Snake());
+        world().instantiateWorldObject(snake);
     }
 }
