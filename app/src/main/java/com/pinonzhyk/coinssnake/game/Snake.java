@@ -1,6 +1,7 @@
 package com.pinonzhyk.coinssnake.game;
 
 import com.pinonzhyk.coinssnake.world.IntVector2;
+import com.pinonzhyk.coinssnake.world.VectorMath;
 import com.pinonzhyk.coinssnake.world.WorldObject;
 
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ public class Snake extends WorldObject.Component implements WorldObject.UpdateRe
     private List<WorldObject> tails;
     private int direction;
     private float speed = 10;
+    private float tailOffset = 10;
 
     @Override
     protected void onInit() {
@@ -47,9 +49,12 @@ public class Snake extends WorldObject.Component implements WorldObject.UpdateRe
         double yStep = direction == 1 || direction == 2 ? 1 : 0;
         float delta = (float) Math.ceil(deltaTimeStep * speed);
 
-        // todo refactor vector math to be static methods with value type params
-        final IntVector2 newPoint = object().position.add(
-                new IntVector2((int) (xStep * delta), (int) (yStep * delta)));
+        final IntVector2 newPoint = VectorMath.add(
+                object().position,
+                /*x*/(int) (xStep * delta),
+                /*y*/(int) (yStep * delta),
+                new IntVector2());
+
         object().position.set(newPoint);
 
         if (path.size() > tails.size() * 10) {
@@ -63,6 +68,8 @@ public class Snake extends WorldObject.Component implements WorldObject.UpdateRe
         int tailIndex = 0;
         int pointIndex = 0;
         for (IntVector2 point : path) {
+            // on each fifth path's point set next indexed tail position to that vector value
+            // wheres 5 is the offset between tails
             if (pointIndex % 5 == 0 && tailIndex < tails.size()) {
                 final WorldObject tailPart = tails.get(tailIndex);
                 tailPart.position.set(point);
@@ -71,7 +78,9 @@ public class Snake extends WorldObject.Component implements WorldObject.UpdateRe
             pointIndex++;
         }
 
-        // if tails is not counted to the end
+        // if tails is not counted to the end because there is less path points than tails
+        // we use last known path points which should point at the end of the snake's path
+        // e.s should be the oldest
         if (tailIndex < tails.size() - 1 && !path.isEmpty()) {
             final IntVector2 lastPoint = path.getLast();
             for (; tailIndex < tails.size(); tailIndex++) {
