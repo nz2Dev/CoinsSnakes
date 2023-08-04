@@ -59,17 +59,12 @@ public class Snake extends WorldObject.Component implements WorldObject.UpdateRe
 
         if (path.size() > tails.size() * 10) {
             path.removeLast();
-            path.addFirst(newPoint);
-        } else {
-            path.addFirst(newPoint);
         }
+        path.addFirst(newPoint);
     }
 
     @Override
     public void onUpdate(float timeSec) {
-//        double randomSign = Math.copySign(1, Math.random() - 0.5);
-//        double yStep = Math.round(Math.random() + 0.1d);
-
         int tailIndex = 0;
         int pointIndex = 0;
         for (IntVector2 point : path) {
