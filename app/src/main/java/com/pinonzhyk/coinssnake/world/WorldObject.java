@@ -63,8 +63,8 @@ public class WorldObject {
 
     protected void update(float timeSec) {
         for (Component component : components) {
-            if (component instanceof LogicUpdateReceiver) {
-                ((LogicUpdateReceiver) component).onUpdate(timeSec);
+            if (component instanceof UpdateReceiver) {
+                ((UpdateReceiver) component).onUpdate(timeSec);
             }
         }
     }
@@ -74,6 +74,14 @@ public class WorldObject {
             if (component instanceof ClickEventReceiver) {
                 ClickEventReceiver receiver = (ClickEventReceiver) component;
                 receiver.onClickEvent(x, y);
+            }
+        }
+    }
+
+    public void fixedUpdate(float fixedUpdateTime, float fixedUpdateStepTime) {
+        for (Component component : components) {
+            if (component instanceof FixedTimeUpdateReceiver) {
+                ((FixedTimeUpdateReceiver) component).onFixedUpdate(fixedUpdateTime, fixedUpdateStepTime);
             }
         }
     }
@@ -100,8 +108,12 @@ public class WorldObject {
         }
     }
 
-    public interface LogicUpdateReceiver {
+    public interface UpdateReceiver {
         void onUpdate(float timeSec);
+    }
+
+    public interface FixedTimeUpdateReceiver {
+        void onFixedUpdate(float fixedTimeSec, float deltaTimeStep);
     }
 
     public interface ClickEventReceiver {

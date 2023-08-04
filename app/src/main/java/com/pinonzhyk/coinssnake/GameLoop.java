@@ -6,7 +6,6 @@ public class GameLoop implements Choreographer.FrameCallback {
 
     private Choreographer choreographer;
     private Callback callback;
-    private float lastFrameTime;
     private boolean isRunning;
 
     private final boolean calculateFpsDebug;
@@ -40,11 +39,8 @@ public class GameLoop implements Choreographer.FrameCallback {
     public void doFrame(long frameTimeNanos) {
         if (isRunning) {
             final float frameTimeSec = frameTimeNanos / 1000000000f;
-            final float frameTimeDelta = frameTimeSec - lastFrameTime;
-            lastFrameTime = frameTimeSec;
-
             if (callback != null) {
-                callback.onFrame(frameTimeSec, frameTimeDelta);
+                callback.onFrame(frameTimeSec);
             }
 
             if (calculateFpsDebug) {
@@ -68,6 +64,6 @@ public class GameLoop implements Choreographer.FrameCallback {
     }
 
     public interface Callback {
-        void onFrame(float timeSec, float deltaTime);
+        void onFrame(float timeSec);
     }
 }

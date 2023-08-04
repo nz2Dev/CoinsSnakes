@@ -1,29 +1,22 @@
 package com.pinonzhyk.coinssnake.game;
 
-import android.util.Log;
-
 import com.pinonzhyk.coinssnake.world.IntVector2;
 import com.pinonzhyk.coinssnake.world.WorldObject;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
-import java.util.Random;
 
-public class Snake extends WorldObject.Component implements WorldObject.LogicUpdateReceiver {
+public class Snake extends WorldObject.Component implements WorldObject.UpdateReceiver, WorldObject.FixedTimeUpdateReceiver {
 
     private Deque<IntVector2> path;
     private List<WorldObject> tails;
-    private Random random;
     private int direction;
+    private float speed = 10;
 
     @Override
     protected void onInit() {
-        random = new Random();
         path = new LinkedList<>();
         tails = new ArrayList<>();
 
@@ -51,15 +44,17 @@ public class Snake extends WorldObject.Component implements WorldObject.LogicUpd
     public void changeDirection() {
         direction ++;
         direction = direction % 3;
+        speed += 5;
     }
 
     @Override
-    public void onUpdate(float timeSec) {
-//        double randomSign = Math.copySign(1, Math.random() - 0.5);
-//        double yStep = Math.round(Math.random() + 0.1d);
+    public void onFixedUpdate(float fixedTimeSec, float deltaTimeStep) {
         double xStep = direction == 0 || direction == 1 ? 1 : 0;
         double yStep = direction == 1 || direction == 2 ? 1 : 0;
-        IntVector2 newPoint = object().position.add(new IntVector2((int) (xStep * 2), (int) (yStep * 2)));
+        float delta = (float) Math.ceil(deltaTimeStep * speed);
+
+        IntVector2 newPoint = object().position.add(
+                new IntVector2((int) (xStep * delta), (int) (yStep * delta)));
         object().position.set(newPoint);
 
         if (path.size() > tails.size() * 10) {
@@ -68,6 +63,12 @@ public class Snake extends WorldObject.Component implements WorldObject.LogicUpd
         } else {
             path.addFirst(newPoint);
         }
+    }
+
+    @Override
+    public void onUpdate(float timeSec) {
+//        double randomSign = Math.copySign(1, Math.random() - 0.5);
+//        double yStep = Math.round(Math.random() + 0.1d);
 
         int tailIndex = 0;
         int pointIndex = 0;
@@ -81,4 +82,5 @@ public class Snake extends WorldObject.Component implements WorldObject.LogicUpd
         }
 
     }
+
 }

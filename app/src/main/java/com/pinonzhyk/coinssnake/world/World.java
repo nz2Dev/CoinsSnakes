@@ -9,6 +9,9 @@ public class World {
     private final int boundsHeightUnits;
     private final Scene scene;
     private final List<System> systems;
+    private float lastUpdateTime = -1f;
+    private float lastFixedUpdateTime;
+    private final float fixedUpdateStepTime = 1f / 40f;
 
     public World(int boundsWidthUnits, int boundsHeightUnits) {
         this.boundsWidthUnits = boundsWidthUnits;
@@ -78,7 +81,26 @@ public class World {
         }
     }
 
-    public void update(float timeSec, float deltaTime) {
+    public void update(float timeSec) {
+        if (lastUpdateTime == -1) {
+            lastUpdateTime = timeSec;
+            lastFixedUpdateTime = timeSec;
+            for (WorldObject worldObject : scene.getAllObjects()) {
+                worldObject.fixedUpdate(lastFixedUpdateTime, 0);
+            }
+        }
+
+        float fixedDeltaTime = timeSec - lastFixedUpdateTime;
+        while (fixedDeltaTime > fixedUpdateStepTime) {
+            lastFixedUpdateTime += fixedUpdateStepTime;
+            for (WorldObject worldObject : scene.getAllObjects()) {
+                worldObject.fixedUpdate(lastFixedUpdateTime, fixedUpdateStepTime);
+            }
+            fixedDeltaTime = timeSec - lastFixedUpdateTime;
+        }
+
+        final float deltaTime = timeSec - lastUpdateTime;
+        lastUpdateTime = timeSec;
         for (WorldObject worldObject : scene.getAllObjects()) {
             worldObject.update(timeSec);
         }

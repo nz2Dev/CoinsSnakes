@@ -49,9 +49,9 @@ public class GameView extends View implements GameLoop.Callback {
     }
 
     @Override
-    public void onFrame(float timeSec, float deltaTime) {
+    public void onFrame(float timeSec) {
         if (world != null) {
-            world.update(timeSec, deltaTime);
+            world.update(timeSec);
             invalidate();
         }
     }
