@@ -9,6 +9,7 @@ import android.view.View;
 
 import androidx.annotation.Nullable;
 
+import com.pinonzhyk.coinssnake.world.GraphicComponent;
 import com.pinonzhyk.coinssnake.world.TextComponent;
 import com.pinonzhyk.coinssnake.world.World;
 import com.pinonzhyk.coinssnake.world.WorldObject;
@@ -118,21 +119,16 @@ public class GameView extends View implements GameLoop.Callback {
                     worldObject.position.y * pixelsPerSceneUnit
             );
 
-            float halfSurfaceX = worldObject.inputSurfaceSize.x / 2f;
-            float halfSurfaceY = worldObject.inputSurfaceSize.y / 2f;
-            canvas.drawRect(
-                    -halfSurfaceX * pixelsPerSceneUnit,
-                    -halfSurfaceY * pixelsPerSceneUnit,
-                    halfSurfaceX * pixelsPerSceneUnit,
-                    halfSurfaceY * pixelsPerSceneUnit,
-                    paint
-            );
-
             for (WorldObject.Component component : worldObject.getComponents()) {
                 if (component instanceof TextComponent) {
-                    TextComponent textComponent = ((TextComponent) component);
+                    final TextComponent textComponent = ((TextComponent) component);
                     textComponentPaint.setTextSize(textComponent.textSize * pixelsPerSceneUnit);
                     canvas.drawText(textComponent.text, 0, 0, textComponentPaint);
+                }
+                if (component instanceof GraphicComponent) {
+                    final GraphicComponent graphicComponent = ((GraphicComponent) component);
+                    final float halfSize = (graphicComponent.size * pixelsPerSceneUnit) / 2f;
+                    canvas.drawRect(-halfSize, -halfSize, halfSize, halfSize, paint);
                 }
             }
 

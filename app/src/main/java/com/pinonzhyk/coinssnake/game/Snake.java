@@ -1,5 +1,6 @@
 package com.pinonzhyk.coinssnake.game;
 
+import com.pinonzhyk.coinssnake.world.GraphicComponent;
 import com.pinonzhyk.coinssnake.world.Vector2;
 import com.pinonzhyk.coinssnake.world.VectorMath;
 import com.pinonzhyk.coinssnake.world.WorldObject;
@@ -35,6 +36,7 @@ public class Snake extends WorldObject.Component implements WorldObject.UpdateRe
             final int newTailsCount = capacity - tails.size();
             for (int i = 0; i < newTailsCount; i++) {
                 final WorldObject tail = new WorldObject(0, 0, tailSize, tailSize);
+                tail.addComponent(new GraphicComponent(tailSize));
                 world().instantiateWorldObject(tail);
                 tails.add(tail);
             }

@@ -1,5 +1,6 @@
 package com.pinonzhyk.coinssnake.game;
 
+import com.pinonzhyk.coinssnake.world.GraphicComponent;
 import com.pinonzhyk.coinssnake.world.World;
 import com.pinonzhyk.coinssnake.world.WorldObject;
 
@@ -20,6 +21,7 @@ public class FlowerPlantSystem extends World.System implements World.InputSystem
 
                 final float size = world().getBoundsWidthUnits() * 0.1f;
                 WorldObject flower = new WorldObject(x, y, size, size);
+                flower.addComponent(new GraphicComponent(size));
                 flower.addComponent(new Flower());
                 world().instantiateWorldObject(flower);
             }
