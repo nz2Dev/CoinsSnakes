@@ -32,7 +32,8 @@ public class EconomySystem extends World.System implements World.UpdateSystem {
             int y = (int) (world().getBoundsHeightUnits() * 0.075f);
 
             moneyText = new TextComponent();
-            moneyText.textSize = 30;
+            //2.5% of the horizontal space for 1 character
+            moneyText.textSize = (int) (world().getBoundsWidthUnits() * 0.025f);
             final WorldObject moneyTextObj = new WorldObject(x, y);
             moneyTextObj.addComponent(moneyText);
 
