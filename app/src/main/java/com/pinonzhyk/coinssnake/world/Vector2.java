@@ -21,12 +21,12 @@ public final class Vector2 {
         return x == 0 && y == 0;
     }
 
-    public void set(float x, float y) {
+    public void setTo(float x, float y) {
         this.x = x;
         this.y = y;
     }
 
-    public void set(Vector2 vector2) {
+    public void setFrom(Vector2 vector2) {
         this.x = vector2.x;
         this.y = vector2.y;
     }

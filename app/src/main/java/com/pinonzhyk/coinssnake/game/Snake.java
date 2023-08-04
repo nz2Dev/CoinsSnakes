@@ -4,6 +4,7 @@ import com.pinonzhyk.coinssnake.world.Vector2;
 import com.pinonzhyk.coinssnake.world.VectorMath;
 import com.pinonzhyk.coinssnake.world.WorldObject;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.LinkedList;
@@ -20,7 +21,7 @@ public class Snake extends WorldObject.Component implements WorldObject.UpdateRe
 
     @Override
     protected void onInit() {
-        path = new LinkedList<>();
+        path = new ArrayDeque<>();
         tails = new ArrayList<>();
         path.add(object().position);
         setTailsCapacity(5);
@@ -50,11 +51,6 @@ public class Snake extends WorldObject.Component implements WorldObject.UpdateRe
         float xStep = direction == 0 || direction == 1 ? 1 : 0;
         float yStep = direction == 1 || direction == 2 ? 1 : 0;
 
-        float delta = deltaTimeStep * speed;
-        final float segmentsPerOffset = offset / delta;
-        pathSegmentOffset = Math.round(segmentsPerOffset);
-        pathSegmentOffset = Math.max(pathSegmentOffset, 1);
-
         // if the delta value is closer to the offset or greater
         // then the path precision is closer to zero
         // and so the offset then become the max(delta, offset)
@@ -62,18 +58,26 @@ public class Snake extends WorldObject.Component implements WorldObject.UpdateRe
         // which is not the case for the most part, and so this case should not be an issue
         // in this context, but could potentially in other circumstances
 
+        float delta = deltaTimeStep * speed;
+        final float segmentsPerOffset = offset / delta;
+        pathSegmentOffset = Math.round(segmentsPerOffset);
+        pathSegmentOffset = Math.max(pathSegmentOffset, 1);
+
+        if (path.size() > tails.size() * pathSegmentOffset) {
+            // we prevent infinite grow of path deque, but we don't shrink it otherwise,
+            // which should be ok for the most part as well,
+            path.removeLast();
+            // todo and we can reuse the last vector that we will throw away, to avoid allocation
+            // but it introduce some glitches that need to be investigated further
+        }
+
         final Vector2 newPoint = VectorMath.add(
                 object().position,
                 /*x*/ xStep * delta,
                 /*y*/ yStep * delta,
                 new Vector2());
 
-        object().position.set(newPoint);
-        if (path.size() > tails.size() * pathSegmentOffset) {
-            // we prevent infinite grow of path deque, but we don't shrink it
-            // when don't need that much, which should be ok for the most part as well
-            path.removeLast();
-        }
+        object().position.setFrom(newPoint);
         path.addFirst(newPoint);
     }
 
@@ -86,7 +90,7 @@ public class Snake extends WorldObject.Component implements WorldObject.UpdateRe
             // set next indexed tail position to that vector value
             if (pointIndex % pathSegmentOffset == 0 && tailIndex < tails.size()) {
                 final WorldObject tailPart = tails.get(tailIndex);
-                tailPart.position.set(point);
+                tailPart.position.setFrom(point);
                 tailIndex++;
             }
             pointIndex++;
@@ -99,7 +103,7 @@ public class Snake extends WorldObject.Component implements WorldObject.UpdateRe
         if (tailIndex < tails.size() - 1 && !path.isEmpty()) {
             final Vector2 lastPoint = path.getLast();
             for (; tailIndex < tails.size(); tailIndex++) {
-                tails.get(tailIndex).position.set(lastPoint);
+                tails.get(tailIndex).position.setFrom(lastPoint);
             }
         }
     }
