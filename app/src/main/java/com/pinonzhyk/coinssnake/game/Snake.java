@@ -14,14 +14,18 @@ public class Snake extends WorldObject.Component implements WorldObject.UpdateRe
     private Deque<Vector2> path;
     private List<WorldObject> tails;
     private int direction;
-    private float speed = 1;
+    private float speed;
+    private float offset;
+    private int pathSegmentOffset = 1;
 
     @Override
     protected void onInit() {
         path = new LinkedList<>();
         tails = new ArrayList<>();
         path.add(object().position);
-        setTailsCapacity(2);
+        setTailsCapacity(5);
+        speed = world().getBoundsWidthUnits() * 0.1f;
+        offset = world().getBoundsWidthUnits() * 0.02f;
     }
 
     private void setTailsCapacity(int capacity) {
@@ -39,15 +43,24 @@ public class Snake extends WorldObject.Component implements WorldObject.UpdateRe
     public void changeDirection() {
         direction ++;
         direction = direction % 3;
-        speed *= 1.2f;
-        setTailsCapacity((int) speed);
     }
 
     @Override
     public void onFixedUpdate(float fixedTimeSec, float deltaTimeStep) {
         float xStep = direction == 0 || direction == 1 ? 1 : 0;
         float yStep = direction == 1 || direction == 2 ? 1 : 0;
+
         float delta = deltaTimeStep * speed;
+        final float segmentsPerOffset = offset / delta;
+        pathSegmentOffset = Math.round(segmentsPerOffset);
+        pathSegmentOffset = Math.max(pathSegmentOffset, 1);
+
+        // if the delta value is closer to the offset or greater
+        // then the path precision is closer to zero
+        // and so the offset then become the max(delta, offset)
+        // to be so, the speed must be more or around the world.bounds * fps
+        // which is not the case for the most part, and so this case should not be an issue
+        // in this context, but could potentially in other circumstances
 
         final Vector2 newPoint = VectorMath.add(
                 object().position,
@@ -56,8 +69,9 @@ public class Snake extends WorldObject.Component implements WorldObject.UpdateRe
                 new Vector2());
 
         object().position.set(newPoint);
-
-        if (path.size() > tails.size() * 10) {
+        if (path.size() > tails.size() * pathSegmentOffset) {
+            // we prevent infinite grow of path deque, but we don't shrink it
+            // when don't need that much, which should be ok for the most part as well
             path.removeLast();
         }
         path.addFirst(newPoint);
@@ -68,9 +82,9 @@ public class Snake extends WorldObject.Component implements WorldObject.UpdateRe
         int tailIndex = 0;
         int pointIndex = 0;
         for (Vector2 point : path) {
-            // on each fifth path's point set next indexed tail position to that vector value
-            // wheres 5 is the offset between tails
-            if (pointIndex % 5 == 0 && tailIndex < tails.size()) {
+            // on each tail point after skipping the offset which should be constant size,
+            // set next indexed tail position to that vector value
+            if (pointIndex % pathSegmentOffset == 0 && tailIndex < tails.size()) {
                 final WorldObject tailPart = tails.get(tailIndex);
                 tailPart.position.set(point);
                 tailIndex++;
@@ -80,7 +94,8 @@ public class Snake extends WorldObject.Component implements WorldObject.UpdateRe
 
         // if tails is not counted to the end because there is less path points than tails
         // we use last known path points which should point at the end of the snake's path
-        // e.s should be the oldest
+        // e.s should be the oldest. This is a workaround before or if we will implement
+        // manual path generation to adjust the path to the amount of tails
         if (tailIndex < tails.size() - 1 && !path.isEmpty()) {
             final Vector2 lastPoint = path.getLast();
             for (; tailIndex < tails.size(); tailIndex++) {

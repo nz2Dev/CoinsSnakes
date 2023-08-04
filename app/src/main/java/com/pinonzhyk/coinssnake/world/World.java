@@ -11,7 +11,7 @@ public class World {
     private final List<System> systems;
     private float lastUpdateTime = -1f;
     private float lastFixedUpdateTime;
-    private final float fixedUpdateStepTime = 1f / 40f;
+    private final float fixedUpdateStepTime = 1f / 50f;
 
     public World(int boundsWidthUnits, int boundsHeightUnits) {
         this.boundsWidthUnits = boundsWidthUnits;
