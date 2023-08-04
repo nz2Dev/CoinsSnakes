@@ -17,30 +17,40 @@ public class Snake extends WorldObject.Component implements WorldObject.UpdateRe
     private List<WorldObject> tails;
     private int direction;
     private float speed;
+    private float tailSize;
     private float offset;
-    private int pathSegmentOffset = 1;
+    private int pathSegmentOffset;
 
     @Override
     protected void onInit() {
         path = new ArrayDeque<>();
         tails = new ArrayList<>();
         path.add(object().position);
-        setTailsCapacity(5);
+        pathSegmentOffset = 1;
+
+        tailSize = world().getBoundsWidthUnits() * 0.02f;
         speed = world().getBoundsWidthUnits() * 0.1f;
-        offset = world().getBoundsWidthUnits() * 0.02f;
+        offset = tailSize * 2f;
+
+        setTailsCapacity(5);
     }
 
     private void setTailsCapacity(int capacity) {
         if (tails.size() < capacity) {
-            final float tailSize = world().getBoundsWidthUnits() * 0.01f;
             final int newTailsCount = capacity - tails.size();
+            final float surfaceSize = tailSize * 4;
             for (int i = 0; i < newTailsCount; i++) {
-                final WorldObject tail = new WorldObject(0, 0, tailSize, tailSize);
+                final WorldObject tail = new WorldObject(0, 0, surfaceSize, surfaceSize);
                 tail.addComponent(new GraphicComponent(tailSize));
+                tail.addComponent(new SnakeTail(this::onSnakeClicked));
                 world().instantiateWorldObject(tail);
                 tails.add(tail);
             }
         }
+    }
+
+    private void onSnakeClicked() {
+        changeDirection();
     }
 
     public void changeDirection() {
@@ -110,4 +120,20 @@ public class Snake extends WorldObject.Component implements WorldObject.UpdateRe
         }
     }
 
+    private static class SnakeTail extends WorldObject.Component implements WorldObject.ClickEventReceiver {
+        private final SnakeTailClickListener clickListener;
+
+        public SnakeTail(SnakeTailClickListener clickListener) {
+            this.clickListener = clickListener;
+        }
+
+        @Override
+        public void onClickEvent(float x, float y) {
+            clickListener.onTailClicked();
+        }
+    }
+
+    private interface SnakeTailClickListener {
+        void onTailClicked();
+    }
 }

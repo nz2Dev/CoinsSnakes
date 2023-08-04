@@ -3,7 +3,7 @@ package com.pinonzhyk.coinssnake.game;
 import com.pinonzhyk.coinssnake.world.World;
 import com.pinonzhyk.coinssnake.world.WorldObject;
 
-public class SnakeSpawnSystem extends World.System implements World.UpdateSystem, World.InputSystem {
+public class SnakeSpawnSystem extends World.System implements World.UpdateSystem {
 
     private boolean snakeSpawned = false;
     private Snake spawned;
@@ -29,13 +29,6 @@ public class SnakeSpawnSystem extends World.System implements World.UpdateSystem
             snake.addComponent(spawned);
             world().instantiateWorldObject(snake);
             snakeSpawned = true;
-        }
-    }
-
-    @Override
-    public void onClick(WorldObject receiver, float x, float y) {
-        if (receiver == null && spawned != null) {
-            spawned.changeDirection();
         }
     }
 }
