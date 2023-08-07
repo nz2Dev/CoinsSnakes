@@ -99,6 +99,12 @@ public class WorldObject {
         }
     }
 
+    public void destroy() {
+        for (Component component : components) {
+            component.destroy();
+        }
+    }
+
     public static class Component {
         private WorldObject object;
 
@@ -118,6 +124,13 @@ public class WorldObject {
         }
 
         protected void onInit() {
+        }
+
+        private void destroy() {
+            onDestroy();
+        }
+
+        protected void onDestroy() {
         }
     }
 

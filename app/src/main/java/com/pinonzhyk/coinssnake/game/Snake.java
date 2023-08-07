@@ -52,6 +52,14 @@ public class Snake extends WorldObject.Component implements WorldObject.UpdateRe
         }
     }
 
+    private void destroyLastTail() {
+        if (tails.size() > 2) {
+            WorldObject lastTail = tails.get(tails.size() - 1);
+            tails.remove(lastTail);
+            world().destroy(lastTail);
+        }
+    }
+
     private void changeDirectionRandomly() {
         rotate(Math.random() > 0.5d);
     }
@@ -71,7 +79,7 @@ public class Snake extends WorldObject.Component implements WorldObject.UpdateRe
     }
 
     private void onSnakeClicked() {
-        rotate(true);
+        destroyLastTail();
     }
 
     @Override

@@ -73,6 +73,14 @@ public class World {
         }
     }
 
+    public void destroy(WorldObject worldObject) {
+        if (!scene.contains(worldObject)) {
+            throw new RuntimeException("object doesn't not instantiated in this world");
+        }
+        scene.removeObject(worldObject);
+        worldObject.destroy();
+    }
+
     public Collection<WorldObject> getObjects() {
         return scene.getAllObjects();
     }

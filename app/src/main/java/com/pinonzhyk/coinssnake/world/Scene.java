@@ -30,4 +30,8 @@ public class Scene {
     public void addObject(WorldObject object) {
         worldObjects.add(object);
     }
+
+    public void removeObject(WorldObject worldObject) {
+        worldObjects.remove(worldObject);
+    }
 }
