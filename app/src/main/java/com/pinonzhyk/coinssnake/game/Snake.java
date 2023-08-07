@@ -80,25 +80,17 @@ public class Snake extends WorldObject.Component implements WorldObject.UpdateRe
 
     @Override
     public void onFixedUpdate(float fixedTimeSec, float deltaTimeStep) {
-        Vector2 castPoint = VectorMath.add(
-                object().position,
-                direction.x * 0.1f,
-                direction.y * 0.1f,
-                new Vector2());
-
         if (lastDirectionChangeTime + directionChangeIntervalSec < fixedTimeSec) {
             lastDirectionChangeTime = fixedTimeSec;
             changeDirectionRandomly();
         }
 
+        Vector2 castPoint = new Vector2();
+        VectorMath.add(object().position, direction.x * 0.1f, direction.y * 0.1f, castPoint);
         WorldObject obstacle = world().pointCastObject(castPoint);
         if (obstacle != null) {
             changeDirectionRandomly();
-            castPoint = VectorMath.add(
-                    obstacle.position,
-                    direction.x * 0.1f,
-                    direction.y * 0.1f,
-                    castPoint);
+            VectorMath.add(obstacle.position, direction.x * 0.1f, direction.y * 0.1f, castPoint);
             obstacle = world().pointCastObject(castPoint);
             if (obstacle != null) {
                 return;
