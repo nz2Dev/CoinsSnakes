@@ -13,6 +13,8 @@ public class World {
     private float lastFixedUpdateTime;
     private final float fixedUpdateStepTime = 1f / 50f;
     private final List<WorldObject> colliders;
+    private final List<WorldObject> postponedInstantiationObjects;
+    private boolean instantiationPostponed;
 
     public World(int boundsWidthUnits, int boundsHeightUnits) {
         this.boundsWidthUnits = boundsWidthUnits;
@@ -20,6 +22,7 @@ public class World {
         this.scene = new Scene();
         this.systems = new ArrayList<>();
         this.colliders = new ArrayList<>();
+        this.postponedInstantiationObjects = new ArrayList<>();
     }
 
     public int getBoundsWidthUnits() {
@@ -67,9 +70,30 @@ public class World {
     }
 
     public void instantiateWorldObject(WorldObject object) {
+        if (instantiationPostponed) {
+            postponedInstantiationObjects.add(object);
+            return;
+        }
         if (!scene.contains(object)) {
             scene.addObject(object);
             object.init(this);
+        }
+    }
+
+    private void postponeInstantiation() {
+        instantiationPostponed = true;
+    }
+
+    private void runPostponedInstantiation() {
+        instantiationPostponed = false;
+        if (postponedInstantiationObjects.size() > 0) {
+            for (WorldObject object : postponedInstantiationObjects) {
+                if (!scene.contains(object)) {
+                    scene.addObject(object);
+                    object.init(this);
+                }
+            }
+            postponedInstantiationObjects.clear();
         }
     }
 
@@ -110,26 +134,28 @@ public class World {
         if (lastUpdateTime == -1) {
             lastUpdateTime = timeSec;
             lastFixedUpdateTime = timeSec;
-//            for (WorldObject worldObject : scene.getAllObjects()) {
-//                worldObject.fixedUpdate(lastFixedUpdateTime, 0);
-//            }
         }
 
         float fixedDeltaTime = timeSec - lastFixedUpdateTime;
         while (fixedDeltaTime > fixedUpdateStepTime) {
             lastFixedUpdateTime += fixedUpdateStepTime;
             buildColliders();
+
+            postponeInstantiation();
             for (WorldObject worldObject : scene.getAllObjects()) {
                 worldObject.fixedUpdate(lastFixedUpdateTime, fixedUpdateStepTime);
             }
             fixedDeltaTime = timeSec - lastFixedUpdateTime;
+            runPostponedInstantiation();
         }
 
         final float deltaTime = timeSec - lastUpdateTime;
         lastUpdateTime = timeSec;
+        postponeInstantiation();
         for (WorldObject worldObject : scene.getAllObjects()) {
             worldObject.update(timeSec);
         }
+        runPostponedInstantiation();
 
         for (System system : systems) {
             if (system instanceof UpdateSystem) {

@@ -17,6 +17,8 @@ public class Snake extends WorldObject.Component implements WorldObject.UpdateRe
     private float tailSize;
     private float lastDirectionChangeTime;
     private float directionChangeIntervalSec;
+    private float lastGrowTime;
+    private float growIntervalSec;
 
     @Override
     protected void onInit() {
@@ -29,21 +31,36 @@ public class Snake extends WorldObject.Component implements WorldObject.UpdateRe
         path.setSegmentDistance(tailSize * 2f);
 
         directionChangeIntervalSec = 3f;
+        growIntervalSec = 3f;
         setTailsCapacity(5);
+    }
+
+    private WorldObject createTail(SnakeTailClickListener clickListener) {
+        final float surfaceSize = tailSize * 4;
+        final WorldObject tail = new WorldObject(0, 0, new Vector2(surfaceSize, surfaceSize), null);
+        tail.addComponent(new GraphicComponent(tailSize));
+        tail.addComponent(new SnakeTail(clickListener));
+        return tail;
     }
 
     private void setTailsCapacity(int capacity) {
         path.setSegmentsCount(capacity);
         if (tails.size() < capacity) {
             final int newTailsCount = capacity - tails.size();
-            final float surfaceSize = tailSize * 4;
             for (int i = 0; i < newTailsCount; i++) {
-                final WorldObject tail = new WorldObject(0, 0, new Vector2(surfaceSize, surfaceSize), null);
-                tail.addComponent(new GraphicComponent(tailSize));
-                tail.addComponent(new SnakeTail(this::onSnakeClicked));
+                final WorldObject tail = createTail(this::onSnakeClicked);
                 world().instantiateWorldObject(tail);
                 tails.add(tail);
             }
+        }
+    }
+
+    private void growTail() {
+        if (tails.size() < 5) {
+            final WorldObject tail = createTail(this::onSnakeClicked);
+            world().instantiateWorldObject(tail);
+            tails.add(tail);
+            path.setSegmentsCount(tails.size());
         }
     }
 
@@ -80,6 +97,10 @@ public class Snake extends WorldObject.Component implements WorldObject.UpdateRe
 
     @Override
     public void onFixedUpdate(float fixedTimeSec, float deltaTimeStep) {
+        if (lastGrowTime + growIntervalSec < fixedTimeSec) {
+            lastGrowTime = fixedTimeSec;
+            growTail();
+        }
         if (lastDirectionChangeTime + directionChangeIntervalSec < fixedTimeSec) {
             lastDirectionChangeTime = fixedTimeSec;
             changeDirectionRandomly();
