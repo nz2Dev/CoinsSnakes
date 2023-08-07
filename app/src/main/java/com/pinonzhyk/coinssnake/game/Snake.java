@@ -15,7 +15,7 @@ public class Snake extends WorldObject.Component implements WorldObject.UpdateRe
 
     private Deque<Vector2> path;
     private List<WorldObject> tails;
-    private int direction;
+    private Vector2 direction;
     private float speed;
     private float tailSize;
     private float offset;
@@ -25,6 +25,7 @@ public class Snake extends WorldObject.Component implements WorldObject.UpdateRe
     protected void onInit() {
         path = new ArrayDeque<>();
         tails = new ArrayList<>();
+        direction = new Vector2(1, 0);
         path.add(object().position);
         pathSegmentOffset = 1;
 
@@ -54,15 +55,25 @@ public class Snake extends WorldObject.Component implements WorldObject.UpdateRe
     }
 
     public void changeDirection() {
-        direction ++;
-        direction = direction % 3;
+        rotate(true);
+    }
+
+    private void rotate(boolean right) {
+        if (direction.x > 0) {
+            direction.setTo(0, right ? 1 : -1);
+        } else if (direction.x < 0) {
+            direction.setTo(0, right ? -1 : 1);
+        } else if (direction.y > 0) {
+            direction.setTo(right ? -1 : 1, 0);
+        } else if (direction.y < 0) {
+            direction.setTo(right ? 1 : -1, 0);
+        } else {
+            direction.setTo(1, 0);
+        }
     }
 
     @Override
     public void onFixedUpdate(float fixedTimeSec, float deltaTimeStep) {
-        float xStep = direction == 0 || direction == 1 ? 1 : 0;
-        float yStep = direction == 1 || direction == 2 ? 1 : 0;
-
         // if the delta value is closer to the offset or greater
         // then the path precision is closer to zero
         // and so the offset then become the max(delta, offset)
@@ -85,8 +96,8 @@ public class Snake extends WorldObject.Component implements WorldObject.UpdateRe
 
         final Vector2 castPoint = VectorMath.add(
                 object().position,
-                xStep * 0.1f,
-                yStep * 0.1f,
+                direction.x * 0.1f,
+                direction.y * 0.1f,
                 new Vector2());
 
         final WorldObject obstacle = world().pointCastObject(castPoint);
@@ -96,8 +107,8 @@ public class Snake extends WorldObject.Component implements WorldObject.UpdateRe
 
         final Vector2 newPoint = VectorMath.add(
                 object().position,
-                /*x*/ xStep * delta,
-                /*y*/ yStep * delta,
+                /*x*/ direction.x * delta,
+                /*y*/ direction.y * delta,
                 new Vector2());
 
         object().position.setFrom(newPoint);
