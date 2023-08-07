@@ -8,7 +8,6 @@ import com.pinonzhyk.coinssnake.world.WorldObject;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
-import java.util.LinkedList;
 import java.util.List;
 
 public class Snake extends WorldObject.Component implements WorldObject.UpdateReceiver, WorldObject.FixedTimeUpdateReceiver {
@@ -50,10 +49,6 @@ public class Snake extends WorldObject.Component implements WorldObject.UpdateRe
         }
     }
 
-    private void onSnakeClicked() {
-        changeDirection();
-    }
-
     public void changeDirection() {
         rotate(true);
     }
@@ -72,28 +67,12 @@ public class Snake extends WorldObject.Component implements WorldObject.UpdateRe
         }
     }
 
+    private void onSnakeClicked() {
+        changeDirection();
+    }
+
     @Override
     public void onFixedUpdate(float fixedTimeSec, float deltaTimeStep) {
-        // if the delta value is closer to the offset or greater
-        // then the path precision is closer to zero
-        // and so the offset then become the max(delta, offset)
-        // to be so, the speed must be more or around the world.bounds * fps
-        // which is not the case for the most part, and so this case should not be an issue
-        // in this context, but could potentially in other circumstances
-
-        float delta = deltaTimeStep * speed;
-        final float segmentsPerOffset = offset / delta;
-        pathSegmentOffset = Math.round(segmentsPerOffset);
-        pathSegmentOffset = Math.max(pathSegmentOffset, 1);
-
-        if (path.size() > tails.size() * pathSegmentOffset) {
-            // we prevent infinite grow of path deque, but we don't shrink it otherwise,
-            // which should be ok for the most part as well,
-            path.removeLast();
-            // todo and we can reuse the last vector that we will throw away, to avoid allocation
-            // but it introduce some glitches that need to be investigated further
-        }
-
         final Vector2 castPoint = VectorMath.add(
                 object().position,
                 direction.x * 0.1f,
@@ -105,13 +84,41 @@ public class Snake extends WorldObject.Component implements WorldObject.UpdateRe
             return;
         }
 
+        moveAtDirection(deltaTimeStep);
+    }
+
+    private void moveAtDirection(float deltaTimeStep) {
+        float moveDelta = deltaTimeStep * speed;
         final Vector2 newPoint = VectorMath.add(
                 object().position,
-                /*x*/ direction.x * delta,
-                /*y*/ direction.y * delta,
+                /*x*/ direction.x * moveDelta,
+                /*y*/ direction.y * moveDelta,
                 new Vector2());
 
         object().position.setFrom(newPoint);
+        appendPath(moveDelta, newPoint);
+    }
+
+    private void appendPath(float moveDelta, Vector2 newPoint) {
+        // if the delta value is closer to the offset or greater
+        // then the path precision is closer to zero
+        // and so the offset then become the max(delta, offset)
+        // to be so, the speed must be more or around the world.bounds * fps
+        // which is not the case for the most part, and so this case should not be an issue
+        // in this context, but could potentially in other circumstances
+
+        final float segmentsPerOffset = offset / moveDelta;
+        pathSegmentOffset = Math.round(segmentsPerOffset);
+        pathSegmentOffset = Math.max(pathSegmentOffset, 1);
+
+        if (path.size() > tails.size() * pathSegmentOffset) {
+            // we prevent infinite grow of path deque, but we don't shrink it otherwise,
+            // which should be ok for the most part as well,
+            path.removeLast();
+            // todo and we can reuse the last vector that we will throw away, to avoid allocation
+            // but it introduce some glitches that need to be investigated further
+        }
+
         path.addFirst(newPoint);
     }
 
