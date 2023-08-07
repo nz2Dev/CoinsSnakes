@@ -5,40 +5,35 @@ import com.pinonzhyk.coinssnake.world.Vector2;
 import com.pinonzhyk.coinssnake.world.VectorMath;
 import com.pinonzhyk.coinssnake.world.WorldObject;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Deque;
 import java.util.List;
 
 public class Snake extends WorldObject.Component implements WorldObject.UpdateReceiver, WorldObject.FixedTimeUpdateReceiver {
 
-    private Deque<Vector2> path;
+    private SegmentedPath path;
     private List<WorldObject> tails;
     private Vector2 direction;
     private float speed;
     private float tailSize;
-    private float offset;
-    private int pathSegmentOffset;
     private float lastDirectionChangeTime;
     private float directionChangeIntervalSec;
 
     @Override
     protected void onInit() {
-        path = new ArrayDeque<>();
+        path = new SegmentedPath(object().position);
         tails = new ArrayList<>();
         direction = new Vector2(1, 0);
-        path.add(object().position);
-        pathSegmentOffset = 1;
 
         tailSize = world().getBoundsWidthUnits() * 0.02f;
         speed = world().getBoundsWidthUnits() * 0.1f;
-        offset = tailSize * 2f;
-        directionChangeIntervalSec = 3f;
+        path.setSegmentDistance(tailSize * 2f);
 
+        directionChangeIntervalSec = 3f;
         setTailsCapacity(5);
     }
 
     private void setTailsCapacity(int capacity) {
+        path.setSegmentsCount(capacity);
         if (tails.size() < capacity) {
             final int newTailsCount = capacity - tails.size();
             final float surfaceSize = tailSize * 4;
@@ -57,6 +52,7 @@ public class Snake extends WorldObject.Component implements WorldObject.UpdateRe
             WorldObject lastTail = tails.get(tails.size() - 1);
             tails.remove(lastTail);
             world().destroy(lastTail);
+            path.setSegmentsCount(tails.size());
         }
     }
 
@@ -114,63 +110,15 @@ public class Snake extends WorldObject.Component implements WorldObject.UpdateRe
 
     private void moveAtDirection(float deltaTimeStep) {
         float moveDelta = deltaTimeStep * speed;
-        final Vector2 newPoint = VectorMath.add(
-                object().position,
-                /*x*/ direction.x * moveDelta,
-                /*y*/ direction.y * moveDelta,
-                new Vector2());
-
-        object().position.setFrom(newPoint);
-        appendPath(moveDelta, newPoint);
-    }
-
-    private void appendPath(float moveDelta, Vector2 newPoint) {
-        // if the delta value is closer to the offset or greater
-        // then the path precision is closer to zero
-        // and so the offset then become the max(delta, offset)
-        // to be so, the speed must be more or around the world.bounds * fps
-        // which is not the case for the most part, and so this case should not be an issue
-        // in this context, but could potentially in other circumstances
-
-        final float segmentsPerOffset = offset / moveDelta;
-        pathSegmentOffset = Math.round(segmentsPerOffset);
-        pathSegmentOffset = Math.max(pathSegmentOffset, 1);
-
-        if (path.size() > tails.size() * pathSegmentOffset) {
-            // we prevent infinite grow of path deque, but we don't shrink it otherwise,
-            // which should be ok for the most part as well,
-            path.removeLast();
-            // todo and we can reuse the last vector that we will throw away, to avoid allocation
-            // but it introduce some glitches that need to be investigated further
-        }
-
-        path.addFirst(newPoint);
+        path.append(direction.x * moveDelta, direction.y * moveDelta);
+        object().position.setFrom(path.tip());
     }
 
     @Override
     public void onUpdate(float timeSec) {
-        int tailIndex = 0;
-        int pointIndex = 0;
-        for (Vector2 point : path) {
-            // on each tail point after skipping the offset which should be constant size,
-            // set next indexed tail position to that vector value
-            if (pointIndex % pathSegmentOffset == 0 && tailIndex < tails.size()) {
-                final WorldObject tailPart = tails.get(tailIndex);
-                tailPart.position.setFrom(point);
-                tailIndex++;
-            }
-            pointIndex++;
-        }
-
-        // if tails is not counted to the end because there is less path points than tails
-        // we use last known path points which should point at the end of the snake's path
-        // e.s should be the oldest. This is a workaround before or if we will implement
-        // manual path generation to adjust the path to the amount of tails
-        if (tailIndex < tails.size() - 1 && !path.isEmpty()) {
-            final Vector2 lastPoint = path.getLast();
-            for (; tailIndex < tails.size(); tailIndex++) {
-                tails.get(tailIndex).position.setFrom(lastPoint);
-            }
+        final Vector2[] segments = path.segmented();
+        for (int segmentIndex = 0; segmentIndex < segments.length; segmentIndex++) {
+            tails.get(segmentIndex).position.setFrom(segments[segmentIndex]);
         }
     }
 
