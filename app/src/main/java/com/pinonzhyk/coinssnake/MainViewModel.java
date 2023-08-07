@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel;
 
 import com.pinonzhyk.coinssnake.game.EconomySystem;
 import com.pinonzhyk.coinssnake.game.FlowerPlantSystem;
-import com.pinonzhyk.coinssnake.game.Movable;
 import com.pinonzhyk.coinssnake.game.SnakeSpawnSystem;
 import com.pinonzhyk.coinssnake.world.Vector2;
 import com.pinonzhyk.coinssnake.world.World;
