@@ -81,12 +81,8 @@ public class World {
         WorldObject eventReceiver = null;
         for (WorldObject worldObject : scene.getAllObjects()) {
             if (worldObject.canBeClicked()) {
-                float halfSurfaceX = worldObject.inputSurfaceSize.x / 2f;
-                float halfSurfaceY = worldObject.inputSurfaceSize.y / 2f;
-                if (xUnits > worldObject.position.x - halfSurfaceX
-                        && xUnits < worldObject.position.x + halfSurfaceX
-                        && yUnits > worldObject.position.y - halfSurfaceY
-                        && yUnits < worldObject.position.y + halfSurfaceY) {
+                if (RectUtils.isPointInsideSurface(xUnits, yUnits,
+                        worldObject.position, worldObject.inputSurfaceSize)) {
                     worldObject.receiveClickEvent(xUnits, yUnits);
                     eventReceiver = worldObject;
                     break;

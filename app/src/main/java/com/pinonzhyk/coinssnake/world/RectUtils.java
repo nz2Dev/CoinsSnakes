@@ -2,6 +2,10 @@ package com.pinonzhyk.coinssnake.world;
 
 public final class RectUtils {
 
+    static boolean isPointInsideSurface(float x, float y, Vector2 position, Vector2 surfaceSize) {
+        return isPointInsideSurface(x, y, position.x, position.y, surfaceSize.x, surfaceSize.y);
+    }
+
     static boolean isPointInsideSurface(float x, float y, float centerX, float centerY, float width, float height) {
         final float halfWidth = width / 2f;
         final float halfHeight = height / 2f;
