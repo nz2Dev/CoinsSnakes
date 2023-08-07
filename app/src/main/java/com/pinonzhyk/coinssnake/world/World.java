@@ -12,12 +12,14 @@ public class World {
     private float lastUpdateTime = -1f;
     private float lastFixedUpdateTime;
     private final float fixedUpdateStepTime = 1f / 50f;
+    private final List<WorldObject> colliders;
 
     public World(int boundsWidthUnits, int boundsHeightUnits) {
         this.boundsWidthUnits = boundsWidthUnits;
         this.boundsHeightUnits = boundsHeightUnits;
         this.scene = new Scene();
         this.systems = new ArrayList<>();
+        this.colliders = new ArrayList<>();
     }
 
     public int getBoundsWidthUnits() {
@@ -26,6 +28,25 @@ public class World {
 
     public int getBoundsHeightUnits() {
         return boundsHeightUnits;
+    }
+
+    public WorldObject pointCastObject(Vector2 point) {
+        return pointCastObject(point.x, point.y);
+    }
+
+    public WorldObject pointCastObject(float x, float y) {
+        for (WorldObject object : colliders) {
+            if (!object.canCollide()) {
+                throw new RuntimeException("non collidable object is in colliders list");
+            }
+
+            if (RectUtils.isPointInsideSurface(x, y,
+                    object.position.x, object.position.y,
+                    object.colliderSurfaceSize.x, object.colliderSurfaceSize.y)) {
+                return object;
+            }
+        }
+        return null;
     }
 
     public void addSystem(System system) {
@@ -59,7 +80,7 @@ public class World {
     public void handleClickInput(float xUnits, float yUnits) {
         WorldObject eventReceiver = null;
         for (WorldObject worldObject : scene.getAllObjects()) {
-            if (!worldObject.inputSurfaceSize.isZero()) {
+            if (worldObject.canBeClicked()) {
                 float halfSurfaceX = worldObject.inputSurfaceSize.x / 2f;
                 float halfSurfaceY = worldObject.inputSurfaceSize.y / 2f;
                 if (xUnits > worldObject.position.x - halfSurfaceX
@@ -85,14 +106,15 @@ public class World {
         if (lastUpdateTime == -1) {
             lastUpdateTime = timeSec;
             lastFixedUpdateTime = timeSec;
-            for (WorldObject worldObject : scene.getAllObjects()) {
-                worldObject.fixedUpdate(lastFixedUpdateTime, 0);
-            }
+//            for (WorldObject worldObject : scene.getAllObjects()) {
+//                worldObject.fixedUpdate(lastFixedUpdateTime, 0);
+//            }
         }
 
         float fixedDeltaTime = timeSec - lastFixedUpdateTime;
         while (fixedDeltaTime > fixedUpdateStepTime) {
             lastFixedUpdateTime += fixedUpdateStepTime;
+            buildColliders();
             for (WorldObject worldObject : scene.getAllObjects()) {
                 worldObject.fixedUpdate(lastFixedUpdateTime, fixedUpdateStepTime);
             }
@@ -108,6 +130,15 @@ public class World {
         for (System system : systems) {
             if (system instanceof UpdateSystem) {
                 ((UpdateSystem) system).onUpdate(timeSec, deltaTime);
+            }
+        }
+    }
+
+    private void buildColliders() {
+        colliders.clear();
+        for (WorldObject object : scene.getAllObjects()) {
+            if (object.canCollide()) {
+                colliders.add(object);
             }
         }
     }

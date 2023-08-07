@@ -20,6 +20,7 @@ import java.util.Collections;
 public class GameView extends View implements GameLoop.Callback {
 
     private static final boolean DEBUG_DRAW_INPUT_SURFACE = true;
+    private static final boolean DEBUG_DRAW_COLLIDER_SURFACE = true;
 
     private World world;
     private float pixelsPerSceneUnit;
@@ -124,9 +125,21 @@ public class GameView extends View implements GameLoop.Callback {
                     worldObject.position.y * pixelsPerSceneUnit
             );
 
-            if (DEBUG_DRAW_INPUT_SURFACE) {
+            if (DEBUG_DRAW_INPUT_SURFACE && !worldObject.inputSurfaceSize.isZero()) {
                 float halfSurfaceX = worldObject.inputSurfaceSize.x / 2f;
                 float halfSurfaceY = worldObject.inputSurfaceSize.y / 2f;
+                canvas.drawRect(
+                        -halfSurfaceX * pixelsPerSceneUnit,
+                        -halfSurfaceY * pixelsPerSceneUnit,
+                        halfSurfaceX * pixelsPerSceneUnit,
+                        halfSurfaceY * pixelsPerSceneUnit,
+                        inputSurfacePaint
+                );
+            }
+
+            if (DEBUG_DRAW_COLLIDER_SURFACE && !worldObject.colliderSurfaceSize.isZero()) {
+                float halfSurfaceX = worldObject.colliderSurfaceSize.x / 2f;
+                float halfSurfaceY = worldObject.colliderSurfaceSize.y / 2f;
                 canvas.drawRect(
                         -halfSurfaceX * pixelsPerSceneUnit,
                         -halfSurfaceY * pixelsPerSceneUnit,

@@ -17,6 +17,7 @@ public class WorldObject {
      * Can't be negative.
      */
     public final Vector2 inputSurfaceSize;
+    public final Vector2 colliderSurfaceSize;
     public final Vector2 position;
     private final List<Component> components = new ArrayList<>();
     private World world;
@@ -24,11 +25,23 @@ public class WorldObject {
     public WorldObject(float x, float y) {
         this.position = new Vector2(x, y);
         this.inputSurfaceSize = new Vector2();
+        this.colliderSurfaceSize = new Vector2();
     }
 
-    public WorldObject(float x, float y, float surfaceSizeX, float surfaceSizeY) {
+    public WorldObject(float x, float y,
+                        Vector2 inputSurfaceSize,
+                        Vector2 colliderSurfaceSize) {
         this.position = new Vector2(x, y);
-        this.inputSurfaceSize = new Vector2(surfaceSizeX, surfaceSizeY);
+        this.inputSurfaceSize = inputSurfaceSize == null ? new Vector2() : inputSurfaceSize;
+        this.colliderSurfaceSize = colliderSurfaceSize == null ? new Vector2() : colliderSurfaceSize;
+    }
+
+    protected boolean canCollide() {
+        return !colliderSurfaceSize.isZero();
+    }
+
+    protected boolean canBeClicked() {
+        return !inputSurfaceSize.isZero();
     }
 
     public void addComponent(Component component) {

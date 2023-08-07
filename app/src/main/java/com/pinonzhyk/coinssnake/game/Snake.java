@@ -40,7 +40,7 @@ public class Snake extends WorldObject.Component implements WorldObject.UpdateRe
             final int newTailsCount = capacity - tails.size();
             final float surfaceSize = tailSize * 4;
             for (int i = 0; i < newTailsCount; i++) {
-                final WorldObject tail = new WorldObject(0, 0, surfaceSize, surfaceSize);
+                final WorldObject tail = new WorldObject(0, 0, new Vector2(surfaceSize, surfaceSize), null);
                 tail.addComponent(new GraphicComponent(tailSize));
                 tail.addComponent(new SnakeTail(this::onSnakeClicked));
                 world().instantiateWorldObject(tail);
@@ -81,6 +81,17 @@ public class Snake extends WorldObject.Component implements WorldObject.UpdateRe
             path.removeLast();
             // todo and we can reuse the last vector that we will throw away, to avoid allocation
             // but it introduce some glitches that need to be investigated further
+        }
+
+        final Vector2 castPoint = VectorMath.add(
+                object().position,
+                xStep * 0.1f,
+                yStep * 0.1f,
+                new Vector2());
+
+        final WorldObject obstacle = world().pointCastObject(castPoint);
+        if (obstacle != null) {
+            return;
         }
 
         final Vector2 newPoint = VectorMath.add(

@@ -8,6 +8,7 @@ import com.pinonzhyk.coinssnake.game.EconomySystem;
 import com.pinonzhyk.coinssnake.game.FlowerPlantSystem;
 import com.pinonzhyk.coinssnake.game.Movable;
 import com.pinonzhyk.coinssnake.game.SnakeSpawnSystem;
+import com.pinonzhyk.coinssnake.world.Vector2;
 import com.pinonzhyk.coinssnake.world.World;
 import com.pinonzhyk.coinssnake.world.WorldObject;
 
@@ -39,7 +40,31 @@ public class MainViewModel extends ViewModel {
         gameWorld.addSystem(new EconomySystem(150));
         gameWorld.addSystem(new FlowerPlantSystem(50));
         gameWorld.addSystem(new SnakeSpawnSystem());
+        instantiateWalls(gameWorld);
         worldData.postValue(gameWorld);
+    }
+
+    private void instantiateWalls(final World gameWorld) {
+        gameWorld.instantiateWorldObject(createHorizontalWallInBounds(-0.5f, 1, gameWorld));
+        gameWorld.instantiateWorldObject(createHorizontalWallInBounds(gameWorld.getBoundsWidthUnits() + 0.5f, 1, gameWorld));
+        gameWorld.instantiateWorldObject(createVerticalWallInBounds(-0.5f, 1, gameWorld));
+        gameWorld.instantiateWorldObject(createVerticalWallInBounds(gameWorld.getBoundsHeightUnits() + 0.5f, 1, gameWorld));
+    }
+
+    private WorldObject createVerticalWallInBounds(float centerY, float size, World world) {
+        final float x = world.getBoundsWidthUnits() / 2f;
+        final float y = centerY;
+        final float colliderWidth = world.getBoundsWidthUnits() + size;
+        final float colliderHeight = size;
+        return new WorldObject(x, y, null, new Vector2(colliderWidth, colliderHeight));
+    }
+
+    private WorldObject createHorizontalWallInBounds(float centerX, float size, World world) {
+        final float x = centerX;
+        final float y = world.getBoundsHeightUnits() / 2f;
+        final float colliderWidth = size;
+        final float colliderHeight = world.getBoundsHeightUnits() + size; // + width to cover corners
+        return new WorldObject(x, y, null, new Vector2(colliderWidth, colliderHeight));
     }
 
 }
