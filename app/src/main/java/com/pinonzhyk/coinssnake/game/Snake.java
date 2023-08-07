@@ -19,6 +19,8 @@ public class Snake extends WorldObject.Component implements WorldObject.UpdateRe
     private float tailSize;
     private float offset;
     private int pathSegmentOffset;
+    private float lastDirectionChangeTime;
+    private float directionChangeIntervalSec;
 
     @Override
     protected void onInit() {
@@ -31,6 +33,7 @@ public class Snake extends WorldObject.Component implements WorldObject.UpdateRe
         tailSize = world().getBoundsWidthUnits() * 0.02f;
         speed = world().getBoundsWidthUnits() * 0.1f;
         offset = tailSize * 2f;
+        directionChangeIntervalSec = 3f;
 
         setTailsCapacity(5);
     }
@@ -49,8 +52,8 @@ public class Snake extends WorldObject.Component implements WorldObject.UpdateRe
         }
     }
 
-    public void changeDirection() {
-        rotate(true);
+    private void changeDirectionRandomly() {
+        rotate(Math.random() > 0.5d);
     }
 
     private void rotate(boolean right) {
@@ -68,7 +71,7 @@ public class Snake extends WorldObject.Component implements WorldObject.UpdateRe
     }
 
     private void onSnakeClicked() {
-        changeDirection();
+        rotate(true);
     }
 
     @Override
@@ -79,9 +82,14 @@ public class Snake extends WorldObject.Component implements WorldObject.UpdateRe
                 direction.y * 0.1f,
                 new Vector2());
 
+        if (lastDirectionChangeTime + directionChangeIntervalSec < fixedTimeSec) {
+            lastDirectionChangeTime = fixedTimeSec;
+            changeDirectionRandomly();
+        }
+
         WorldObject obstacle = world().pointCastObject(castPoint);
         if (obstacle != null) {
-            rotate(Math.random() > 0.5f);
+            changeDirectionRandomly();
             castPoint = VectorMath.add(
                     obstacle.position,
                     direction.x * 0.1f,
