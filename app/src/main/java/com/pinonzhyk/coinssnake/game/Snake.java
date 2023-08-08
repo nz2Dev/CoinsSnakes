@@ -32,7 +32,7 @@ public class Snake extends WorldObject.Component implements WorldObject.UpdateRe
 
         directionChangeIntervalSec = 3f;
         growIntervalSec = 3f;
-        setTailsCapacity(5);
+        setTailsCapacity(2);
     }
 
     private WorldObject createTail(SnakeTailClickListener clickListener) {
@@ -65,11 +65,14 @@ public class Snake extends WorldObject.Component implements WorldObject.UpdateRe
     }
 
     private void destroyLastTail() {
-        if (tails.size() > 2) {
+        if (tails.size() > 0) {
             WorldObject lastTail = tails.get(tails.size() - 1);
             tails.remove(lastTail);
             world().destroy(lastTail);
             path.setSegmentsCount(tails.size());
+        }
+        if (tails.isEmpty()) {
+            world().destroy(object());
         }
     }
 
