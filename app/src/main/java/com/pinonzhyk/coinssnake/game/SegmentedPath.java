@@ -73,7 +73,7 @@ public class SegmentedPath {
         // we use last known path points which should point at the end of the path
         // e.s should be the oldest. This is a workaround before or if we will implement
         // manual path generation to adjust the path to the amount of tails
-        if (segmentIndex < segments.length - 1 && !points.isEmpty()) {
+        if (segmentIndex < segments.length && !points.isEmpty()) {
             final Vector2 lastPoint = points.getLast();
             for (; segmentIndex < segments.length; segmentIndex++) {
                 segments[segmentIndex] = lastPoint;
