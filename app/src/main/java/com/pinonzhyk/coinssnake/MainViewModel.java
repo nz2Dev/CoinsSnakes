@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.pinonzhyk.coinssnake.game.EconomySystem;
 import com.pinonzhyk.coinssnake.game.FlowerPlantSystem;
+import com.pinonzhyk.coinssnake.game.GameManager;
 import com.pinonzhyk.coinssnake.game.SnakeSpawnSystem;
 import com.pinonzhyk.coinssnake.world.Vector2;
 import com.pinonzhyk.coinssnake.world.World;
@@ -36,6 +37,7 @@ public class MainViewModel extends ViewModel {
 
     private void createGame() {
         final World gameWorld = new World(10, 10);
+        gameWorld.addSystem(new GameManager());
         gameWorld.addSystem(new EconomySystem(150));
         gameWorld.addSystem(new FlowerPlantSystem(50));
         gameWorld.addSystem(new SnakeSpawnSystem());

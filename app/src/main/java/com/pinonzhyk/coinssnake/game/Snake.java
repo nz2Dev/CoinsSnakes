@@ -55,8 +55,8 @@ public class Snake extends WorldObject.Component implements WorldObject.UpdateRe
         }
     }
 
-    private void growTail() {
-        if (tails.size() < 5) {
+    private void growTail(int maxSize) {
+        if (tails.size() < maxSize) {
             final WorldObject tail = createTail(this::onSnakeClicked);
             world().instantiateWorldObject(tail);
             tails.add(tail);
@@ -97,10 +97,12 @@ public class Snake extends WorldObject.Component implements WorldObject.UpdateRe
 
     @Override
     public void onFixedUpdate(float fixedTimeSec, float deltaTimeStep) {
+        final GameManager gameManager = world().findSystem(GameManager.class);
         if (lastGrowTime + growIntervalSec < fixedTimeSec) {
             lastGrowTime = fixedTimeSec;
-            growTail();
+            growTail(gameManager.maxSnakeSize());
         }
+
         if (lastDirectionChangeTime + directionChangeIntervalSec < fixedTimeSec) {
             lastDirectionChangeTime = fixedTimeSec;
             changeDirectionRandomly();
@@ -118,11 +120,11 @@ public class Snake extends WorldObject.Component implements WorldObject.UpdateRe
             }
         }
 
-        moveAtDirection(deltaTimeStep);
+        moveAtDirection(deltaTimeStep, gameManager.getSnakeSpeedMultiplier());
     }
 
-    private void moveAtDirection(float deltaTimeStep) {
-        float moveDelta = deltaTimeStep * speed;
+    private void moveAtDirection(float deltaTimeStep, float speedMultiplier) {
+        float moveDelta = deltaTimeStep * speed * speedMultiplier;
         path.append(direction.x * moveDelta, direction.y * moveDelta);
         object().position.setFrom(path.tip());
     }

@@ -10,18 +10,8 @@ public class SnakeSpawnSystem extends World.System implements World.UpdateSystem
 
     @Override
     public void onUpdate(float timeSec, float deltaTime) {
-        boolean worldContainFlower = false;
-        for (WorldObject object : world().getObjects()) {
-            if (object.hasComponent(Flower.class)) {
-                worldContainFlower = true;
-                break;
-            }
-        }
-
-        if (!worldContainFlower) {
-            return;
-        }
-        if (lastSpawnTime + spawnInterval > timeSec) {
+        final GameManager gameManager = world().findSystem(GameManager.class);
+        if (!gameManager.isSnakeSpawnAllowed() || lastSpawnTime + spawnInterval > timeSec) {
             return;
         }
 

@@ -15,8 +15,8 @@ public class FlowerPlantSystem extends World.System implements World.InputSystem
 
     @Override
     public void onClick(WorldObject receiver, float x, float y) {
+        final EconomySystem economySystem = world().findSystem(EconomySystem.class);
         if (receiver == null) {
-            final EconomySystem economySystem = world().findSystem(EconomySystem.class);
             if (economySystem.canAfford(flowerPrice)) {
                 economySystem.spend(flowerPrice);
 
@@ -25,6 +25,14 @@ public class FlowerPlantSystem extends World.System implements World.InputSystem
                 flower.addComponent(new GraphicComponent(size));
                 flower.addComponent(new Flower());
                 world().instantiateWorldObject(flower);
+                world().findSystem(GameManager.class).flowerPlanted();
+            } else {
+                final Flower flower = world().findFirstObjectWithComponent(Flower.class);
+                if (flower != null) {
+                    economySystem.earn(flowerPrice);
+                    world().destroy(flower.object());
+                    world().findSystem(GameManager.class).flowerEaten();
+                }
             }
         }
     }

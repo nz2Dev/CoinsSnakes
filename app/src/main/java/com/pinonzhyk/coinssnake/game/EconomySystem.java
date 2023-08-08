@@ -25,6 +25,10 @@ public class EconomySystem extends World.System implements World.UpdateSystem {
         this.money -= money;
     }
 
+    public void earn(int money) {
+        this.money += money;
+    }
+
     @Override
     public void onUpdate(float timeSec, float deltaTime) {
         if (moneyText == null) {

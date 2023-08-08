@@ -112,7 +112,7 @@ public class WorldObject {
             this.object = holder;
         }
 
-        protected WorldObject object() {
+        public WorldObject object() {
             return object;
         }
         protected World world() {

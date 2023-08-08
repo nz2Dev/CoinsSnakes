@@ -1,5 +1,7 @@
 package com.pinonzhyk.coinssnake.world;
 
+import com.pinonzhyk.coinssnake.game.Flower;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -173,13 +175,27 @@ public class World {
         }
     }
 
+    public <T extends WorldObject.Component> T findFirstObjectWithComponent(Class<T> aClass) {
+        for (WorldObject object : scene.getAllObjects()) {
+            for (WorldObject.Component component : object.getComponents()) {
+                if (aClass.isAssignableFrom(component.getClass())) {
+                    return (T) component;
+                }
+            }
+        }
+        return null;
+    }
+
     public static abstract class System {
         private World world;
         private void attach(World world) {
             this.world = world;
+            onAttached();
         }
-        protected World world() {
+        protected final World world() {
             return world;
+        }
+        protected void onAttached() {
         }
     }
 
