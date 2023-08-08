@@ -108,15 +108,19 @@ public class Snake extends WorldObject.Component implements WorldObject.UpdateRe
             changeDirectionRandomly();
         }
 
-        Vector2 castPoint = new Vector2();
-        VectorMath.add(object().position, direction.x * 0.1f, direction.y * 0.1f, castPoint);
-        WorldObject obstacle = world().pointCastObject(castPoint);
+        final Vector2 checkPoint = new Vector2();
+        VectorMath.add(object().position, direction.x * 0.1f, direction.y * 0.1f, checkPoint);
+        final WorldObject obstacle = world().pointCastObject(checkPoint);
         if (obstacle != null) {
-            changeDirectionRandomly();
-            VectorMath.add(obstacle.position, direction.x * 0.1f, direction.y * 0.1f, castPoint);
-            obstacle = world().pointCastObject(castPoint);
-            if (obstacle != null) {
-                return;
+            if (obstacle.getTagId() == GameManager.FLOWER_TAG_ID) {
+                obstacle.findComponent(Flower.class).destroySelf();
+                world().findSystem(GameManager.class).flowerEaten();
+            } else {
+                changeDirectionRandomly();
+                VectorMath.add(object().position, direction.x * 0.1f, direction.y * 0.1f, checkPoint);
+                if (world().pointCastObject(checkPoint) != null) {
+                    return;
+                }
             }
         }
 

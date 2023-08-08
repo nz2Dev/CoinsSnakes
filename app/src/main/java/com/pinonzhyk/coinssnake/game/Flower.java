@@ -15,6 +15,10 @@ public class Flower extends WorldObject.Component implements WorldObject.UpdateR
         earnPerYield = 1;
     }
 
+    public void destroySelf() {
+        world().destroy(object());
+    }
+
     @Override
     public void onUpdate(float timeSec) {
         if (lastYieldCheckTime < 0) {

@@ -6,6 +6,8 @@ import com.pinonzhyk.coinssnake.world.World;
 
 public class GameManager extends World.System implements World.UpdateSystem {
 
+    public static final int FLOWER_TAG_ID = 1;
+
     private int plantedFlowers;
     private int eatenFlowers;
     private float lastEatenFlowerTime;

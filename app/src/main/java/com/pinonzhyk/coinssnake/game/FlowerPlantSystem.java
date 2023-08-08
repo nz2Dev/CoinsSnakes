@@ -21,18 +21,12 @@ public class FlowerPlantSystem extends World.System implements World.InputSystem
                 economySystem.spend(flowerPrice);
 
                 final float size = world().getBoundsWidthUnits() * 0.1f;
-                WorldObject flower = new WorldObject(x, y, new Vector2(size, size), null);
+                WorldObject flower = new WorldObject(x, y, new Vector2(size, size), new Vector2(size, size));
+                flower.setTagId(GameManager.FLOWER_TAG_ID);;
                 flower.addComponent(new GraphicComponent(size));
                 flower.addComponent(new Flower());
                 world().instantiateWorldObject(flower);
                 world().findSystem(GameManager.class).flowerPlanted();
-            } else {
-                final Flower flower = world().findFirstObjectWithComponent(Flower.class);
-                if (flower != null) {
-                    economySystem.earn(flowerPrice);
-                    world().destroy(flower.object());
-                    world().findSystem(GameManager.class).flowerEaten();
-                }
             }
         }
     }

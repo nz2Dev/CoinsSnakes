@@ -21,11 +21,13 @@ public class WorldObject {
     public final Vector2 position;
     private final List<Component> components = new ArrayList<>();
     private World world;
+    private int tagId;
 
     public WorldObject(float x, float y) {
         this.position = new Vector2(x, y);
         this.inputSurfaceSize = new Vector2();
         this.colliderSurfaceSize = new Vector2();
+        this.tagId = -1;
     }
 
     public WorldObject(float x, float y,
@@ -34,6 +36,18 @@ public class WorldObject {
         this.position = new Vector2(x, y);
         this.inputSurfaceSize = inputSurfaceSize == null ? new Vector2() : inputSurfaceSize;
         this.colliderSurfaceSize = colliderSurfaceSize == null ? new Vector2() : colliderSurfaceSize;
+        this.tagId = -1;
+    }
+
+    public void setTagId(int tagId) {
+        if (tagId < 0) {
+            throw new RuntimeException("can't set negative tag id, it's reserved for special cases");
+        }
+        this.tagId = tagId;
+    }
+
+    public int getTagId() {
+        return tagId;
     }
 
     protected boolean canCollide() {
@@ -50,6 +64,15 @@ public class WorldObject {
         }
         components.add(component);
         component.attach(this);
+    }
+
+    public <T extends Component> T findComponent(Class<T> type) {
+        for (Component component : components) {
+            if (type.isAssignableFrom(component.getClass())) {
+                return (T) component;
+            }
+        }
+        return null;
     }
 
     public <T extends Component> boolean hasComponent(Class<T> type) {

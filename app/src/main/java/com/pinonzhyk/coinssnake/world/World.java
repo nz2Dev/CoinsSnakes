@@ -1,7 +1,5 @@
 package com.pinonzhyk.coinssnake.world;
 
-import com.pinonzhyk.coinssnake.game.Flower;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -16,7 +14,8 @@ public class World {
     private final float fixedUpdateStepTime = 1f / 50f;
     private final List<WorldObject> colliders;
     private final List<WorldObject> postponedInstantiationObjects;
-    private boolean instantiationPostponed;
+    private final List<WorldObject> postponedDestructionObjects;
+    private boolean changesPostponed;
 
     public World(int boundsWidthUnits, int boundsHeightUnits) {
         this.boundsWidthUnits = boundsWidthUnits;
@@ -25,6 +24,7 @@ public class World {
         this.systems = new ArrayList<>();
         this.colliders = new ArrayList<>();
         this.postponedInstantiationObjects = new ArrayList<>();
+        this.postponedDestructionObjects = new ArrayList<>();
     }
 
     public int getBoundsWidthUnits() {
@@ -72,7 +72,7 @@ public class World {
     }
 
     public void instantiateWorldObject(WorldObject object) {
-        if (instantiationPostponed) {
+        if (changesPostponed) {
             postponedInstantiationObjects.add(object);
             return;
         }
@@ -82,12 +82,12 @@ public class World {
         }
     }
 
-    private void postponeInstantiation() {
-        instantiationPostponed = true;
+    private void postponeStructureChanges() {
+        changesPostponed = true;
     }
 
-    private void runPostponedInstantiation() {
-        instantiationPostponed = false;
+    private void runPostponedStructureChanges() {
+        changesPostponed = false;
         if (postponedInstantiationObjects.size() > 0) {
             for (WorldObject object : postponedInstantiationObjects) {
                 if (!scene.contains(object)) {
@@ -97,9 +97,23 @@ public class World {
             }
             postponedInstantiationObjects.clear();
         }
+        if (postponedDestructionObjects.size() > 0) {
+            for (WorldObject object : postponedDestructionObjects) {
+                if (!scene.contains(object)) {
+                    throw new RuntimeException("object doesn't not instantiated in this world");
+                }
+                scene.removeObject(object);
+                object.destroy();
+            }
+            postponedDestructionObjects.clear();
+        }
     }
 
     public void destroy(WorldObject worldObject) {
+        if (changesPostponed) {
+            postponedDestructionObjects.add(worldObject);
+            return;
+        }
         if (!scene.contains(worldObject)) {
             throw new RuntimeException("object doesn't not instantiated in this world");
         }
@@ -143,21 +157,21 @@ public class World {
             lastFixedUpdateTime += fixedUpdateStepTime;
             buildColliders();
 
-            postponeInstantiation();
+            postponeStructureChanges();
             for (WorldObject worldObject : scene.getAllObjects()) {
                 worldObject.fixedUpdate(lastFixedUpdateTime, fixedUpdateStepTime);
             }
             fixedDeltaTime = timeSec - lastFixedUpdateTime;
-            runPostponedInstantiation();
+            runPostponedStructureChanges();
         }
 
         final float deltaTime = timeSec - lastUpdateTime;
         lastUpdateTime = timeSec;
-        postponeInstantiation();
+        postponeStructureChanges();
         for (WorldObject worldObject : scene.getAllObjects()) {
             worldObject.update(timeSec);
         }
-        runPostponedInstantiation();
+        runPostponedStructureChanges();
 
         for (System system : systems) {
             if (system instanceof UpdateSystem) {
