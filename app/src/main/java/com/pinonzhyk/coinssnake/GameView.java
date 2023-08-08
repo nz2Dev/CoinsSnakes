@@ -152,6 +152,7 @@ public class GameView extends View implements GameLoop.Callback {
             for (WorldObject.Component component : worldObject.getComponents()) {
                 if (component instanceof TextComponent) {
                     final TextComponent textComponent = ((TextComponent) component);
+                    textComponentPaint.setTextAlign(textComponent.centered ? Paint.Align.CENTER : Paint.Align.LEFT);
                     textComponentPaint.setTextSize(textComponent.textSize * pixelsPerSceneUnit);
                     canvas.drawText(textComponent.text, 0, 0, textComponentPaint);
                 }
